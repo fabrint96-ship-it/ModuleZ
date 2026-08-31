@@ -28,10 +28,13 @@ namespace ModuleZ.OpenWorld.Runtime
                 ModuleZ.Core.Managers.ModuleZGameState.CurrentOpenWorldTheme
             );
 
-            CreateMusicController();
+            CreateHUDCoordinator();
 
             CreateHUD();
             CreateProgressHUD();
+            CreateAchievementsHUD();
+            CreateStatsHUD();
+            CreateAchievementToastHUD();
             CreateZoneHUD();
             CreateSystemMessageHUD();
 
@@ -39,10 +42,10 @@ namespace ModuleZ.OpenWorld.Runtime
 
             BuildTheme();
 
+            CreateMusicController();
+
             CreatePlayer();
             CreateThirdPersonCamera(player.transform);
-
-            Invoke(nameof(ShowPendingOpenWorldMessage), 0.5f);
 
             StartCoroutine(ShowPendingOpenWorldMessageWhenReady());
 
@@ -67,12 +70,16 @@ namespace ModuleZ.OpenWorld.Runtime
         {
             string message = ModuleZ.Core.Managers.ModuleZGameState.PendingOpenWorldMessage;
 
-            if (string.IsNullOrEmpty(message))
+            bool hasPendingImportantMessage = !string.IsNullOrEmpty(message);
+
+            if (!hasPendingImportantMessage)
                 message = currentThemeData.enterMessage;
+
+            float duration = hasPendingImportantMessage ? 7f : 3f;
 
             if (OpenWorldSystemMessageHUD.Instance != null)
             {
-                OpenWorldSystemMessageHUD.Instance.Show(message, 5f);
+                OpenWorldSystemMessageHUD.Instance.Show(message, duration);
             }
             else
             {
@@ -82,6 +89,8 @@ namespace ModuleZ.OpenWorld.Runtime
             ModuleZ.Core.Managers.ModuleZGameState.PendingOpenWorldMessage = "";
             ModuleZ.Core.Managers.ModuleZGameState.LastDuelResultMessage = "";
             ModuleZ.Core.Managers.ModuleZGameState.ReturningFromDuel = false;
+
+            ModuleZ.OpenWorld.Encounters.ModuleZRivalWorldHUDController.RefreshAll();
         }
 
         private void BuildTheme()
@@ -126,6 +135,7 @@ namespace ModuleZ.OpenWorld.Runtime
             cameraObj.tag = "MainCamera";
 
             Camera camera = cameraObj.AddComponent<Camera>();
+            cameraObj.AddComponent<AudioListener>();
             camera.fieldOfView = 50f;
             camera.clearFlags = CameraClearFlags.Skybox;
 
@@ -150,6 +160,16 @@ namespace ModuleZ.OpenWorld.Runtime
             gameObject.AddComponent<OpenWorldProgressHUD>();
         }
 
+        private void CreateAchievementsHUD()
+        {
+            gameObject.AddComponent<ModuleZAchievementsHUD>();
+        }
+
+        private void CreateAchievementToastHUD()
+        {
+            gameObject.AddComponent<ModuleZAchievementToastHUD>();
+        }
+
         private void CreateMusicController()
         {
             OpenWorldMusicController music = gameObject.AddComponent<OpenWorldMusicController>();
@@ -169,6 +189,16 @@ namespace ModuleZ.OpenWorld.Runtime
         private void CreateSystemMessageHUD()
         {
             gameObject.AddComponent<OpenWorldSystemMessageHUD>();
+        }
+
+        private void CreateStatsHUD()
+        {
+            gameObject.AddComponent<ModuleZStatsHUD>();
+        }
+
+        private void CreateHUDCoordinator()
+        {
+            gameObject.AddComponent<ModuleZHUDOverlayCoordinator>();
         }
     }
 }

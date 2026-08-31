@@ -1,0 +1,2057 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization-Locales
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Localization-Locales
+  m_GUID: 65f1c6c8f8122354bbc32520a26262ac
+  m_SerializeEntries:
+  - m_GUID: 02b01c2b352603f42b907698f05d4d85
+    m_Address: Zulu (zu)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04b001a0fba36c24689f4889a47e9600
+    m_Address: English (United Kingdom) (en-GB)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05015bbe85323374a939de5a60d2e5fc
+    m_Address: Breton (France) (br-FR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05216b64306e79149a45f465b82b6efb
+    m_Address: Italian (Italy) (it-IT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 055c79aa15d64664e91dbcf5853d8133
+    m_Address: Yoruba (yo)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05b4889d66ead44438887a5ea1125d87
+    m_Address: Pashto (Afghanistan) (ps-AF)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 06ba3f9f367e41e46b1db5d38045c4a5
+    m_Address: Norwegian Nynorsk (nn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 06c618b7a1b2c2e4faaa60e65dc57b2d
+    m_Address: Upper Sorbian (Germany) (hsb-DE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 081dd59cf0b2372448d7fc87b57443b2
+    m_Address: Arabic (Morocco) (ar-MA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 088968b1378149c4d8d7032357f2ab87
+    m_Address: Punjabi (Arabic) (pa-Arab)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 08f4280badad6104aa5503b9ec2c97a8
+    m_Address: Albanian (sq)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0902471d6d3760948952bff3cc950d32
+    m_Address: Serbian (Cyrillic) (sr-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 099d40e879b76804d9b6ef63ad69ea02
+    m_Address: Uzbek (Cyrillic, Uzbekistan) (uz-Cyrl-UZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a408cfb6005ec74889e2daa15ff8429
+    m_Address: Hausa (Latin) (ha-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a798c3b618b0bc41ac122c81fc7a90b
+    m_Address: Cherokee (chr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b6632accbf78bc418ce307bf087443d
+    m_Address: Icelandic (is)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c18ff08fc1e31a4ebc789f58e5a6514
+    m_Address: German (de)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0deef09d20f8e304292641b6533f4bd2
+    m_Address: Dutch (Netherlands) (nl-NL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ea7c41aef741fc4cb76116ea1d87648
+    m_Address: Urdu (Pakistan) (ur-PK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f5860848d2e7514a8b49606ba43836e
+    m_Address: Konkani (kok)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 102b30ffd60d623418a6d97080da2b34
+    m_Address: Northern Sami (se)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 107b4872fa035db48aefaa936024e933
+    m_Address: Kazakh (Kazakhstan) (kk-KZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1143e371997a19f4194f3601bf79fe02
+    m_Address: Japanese (ja)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1181f830a63e47c45b99ccfcc46accf5
+    m_Address: English (India) (en-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 12afda4a79e5dbe499ae0330e0d12d20
+    m_Address: Tibetan (bo)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 131152c44aff4ad4682b7ff2cafe03a4
+    m_Address: Croatian (hr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 144462e5c7f29a546a32f0d2b084cc2e
+    m_Address: Azerbaijani (Cyrillic, Azerbaijan) (az-Cyrl-AZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 14d84e6063f826c40adefb0c1cb53fad
+    m_Address: Bangla (bn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 14e94776a3bc5ad478f93a0894db8992
+    m_Address: Lithuanian (lt)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16398f5a7f51633409145b4aebd3de50
+    m_Address: Spanish (Nicaragua) (es-NI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16d70746c56958c44b821b24ed7578f1
+    m_Address: "French (R\xE9union) (fr-RE)"
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 178438b6062d24240ae4569afeaa0c97
+    m_Address: French (Luxembourg) (fr-LU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18956fb29fc3ca64c8f3eb034ce00ec7
+    m_Address: Azerbaijani (Cyrillic) (az-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18b6129c880fd92488588c6449d36d6a
+    m_Address: Polish (Poland) (pl-PL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18b88ea89a1e8b84dadde39b6a450ef6
+    m_Address: French (Morocco) (fr-MA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b4762986b73ebd44819cbd04deaefac
+    m_Address: Bulgarian (bg)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b4802486ce21174c950d250734a7c71
+    m_Address: Macedonian (Macedonia) (mk-MK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b601220a3afbe44c9f8fdd84466dce3
+    m_Address: Basque (eu)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1bb1f8dbd8457b840913ed6fb3702bb8
+    m_Address: Hawaiian (United States) (haw-US)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c66cb33eac9123428c000fcd2ff81a3
+    m_Address: Spanish (Argentina) (es-AR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e3ce2375e37ca54db0da55e334e2a49
+    m_Address: Dutch (nl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ed86ba84d8566f4fbc924a228325060
+    m_Address: Turkmen (Turkmenistan) (tk-TM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1fac803a3abea5447a0bb79fab6f9a8f
+    m_Address: Arabic (Oman) (ar-OM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2005fbe0934df324a8d3de91b183cf65
+    m_Address: Spanish (es)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 202ae93ab28ef9a4eb8329b7938df7ac
+    m_Address: French (Congo - Kinshasa) (fr-CD)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21128267de4178f408f2292818db9bac
+    m_Address: Marathi (India) (mr-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2152615264930904db7e6f36bb1e4bc9
+    m_Address: Uyghur (China) (ug-CN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 217badae7d004254cac92d3ceced7577
+    m_Address: Chinese (Simplified, Singapore) (zh-SG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 219bbfd0c3fd82f4b9564af697e075c6
+    m_Address: Mongolian (mn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21a2c787d87ca0d488ead343cbea024f
+    m_Address: Tajik (Cyrillic, Tajikistan) (tg-Cyrl-TJ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2221bc043f43a86458efb49bbbe11e82
+    m_Address: Igbo (ig)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 22890441ab9ee3346862487eef153ca5
+    m_Address: French (Haiti) (fr-HT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2356c71aec9f01d429ba96a51a39d646
+    m_Address: Arabic (Tunisia) (ar-TN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 245e5d53c99e4b74a8fd40f8103357ec
+    m_Address: Spanish (Paraguay) (es-PY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24752708877b7344c8eb626b80d125f6
+    m_Address: Bosnian (bs)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24cad1acf7d029f4db5f8fc3b1f1a1ca
+    m_Address: English (South Africa) (en-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2509a6f42df19084a966e3ca19fcfd87
+    m_Address: Turkish (Turkey) (tr-TR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 256b7b180c69a5c4ab40f8ca6da2c9ca
+    m_Address: Kyrgyz (Kyrgyzstan) (ky-KG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 272df614bb705b5499f544c97092cbaf
+    m_Address: Tajik (Cyrillic) (tg-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28a560b9049d3634388a7c6e8fd54fa7
+    m_Address: Sinhala (si)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 295eeb848012c394880dadbc94b54af3
+    m_Address: Zulu (South Africa) (zu-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2b12ce15afc63da45a575ae9185134ca
+    m_Address: Xhosa (xh)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2b39e319386cfab4990d5387d064ceea
+    m_Address: Spanish (Guatemala) (es-GT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2bab3697d5d1def458aca533d3bcaa93
+    m_Address: Azerbaijani (Latin) (az-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2fd3b54a1019ca944ad2dbd98e731dcc
+    m_Address: Uzbek (uz)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31b970e3c6656a44783a6f19f7f614d7
+    m_Address: Tajik (tg)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3447244106e89334391a7f0356109bb7
+    m_Address: Welsh (cy)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34830a5c1176b5549a1867e08f6de67a
+    m_Address: Russian (ru)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34cf536b27a8f554c9b7f5558e47c4dd
+    m_Address: Malayalam (ml)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 352bedc3017d15743bb71cc40bea1d66
+    m_Address: Hawaiian (haw)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3775605f2c343884aa8a640faf4a9da8
+    m_Address: Serbian (Latin, Serbia) (sr-Latn-RS)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38a82fa515aa46e42ac9a5f5e5332ea3
+    m_Address: Arabic (Yemen) (ar-YE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38a83d338c7af4b459e35b2249e42c93
+    m_Address: Latvian (Latvia) (lv-LV)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38feca73dd361aa48a24a301e2275810
+    m_Address: Hungarian (Hungary) (hu-HU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39aa7c13c446ae241898978238e4806c
+    m_Address: Spanish (Dominican Republic) (es-DO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a311c984ed3f364087545302daf593b
+    m_Address: Serbian (Latin) (sr-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a55bad46759a264197bd4270123e677
+    m_Address: Slovak (Slovakia) (sk-SK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b6c362e88da403458427cdfbe1c9858
+    m_Address: Swiss German (gsw)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c2da442a37d1074fa06f09e9114aa70
+    m_Address: Inari Sami (Finland) (smn-FI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c4b1358ec8192341b23320c2deb68b5
+    m_Address: French (Canada) (fr-CA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c9951fa23076c1478f3c982a2d228ab
+    m_Address: Oromo (Ethiopia) (om-ET)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c9ac8fe8de91d5478e9441d476afdea
+    m_Address: English (Hong Kong SAR China) (en-HK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ca9733092eb4964ba791317eba69540
+    m_Address: Danish (da)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3cc7a16e48f970e4aa588cd7e9b52093
+    m_Address: Khmer (Cambodia) (km-KH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ce3cb8ad0f4fcd45bc2f3452a43def0
+    m_Address: English (Zimbabwe) (en-ZW)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d8cd3671ac3c564ab41d2544b3bb414
+    m_Address: French (Mali) (fr-ML)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d935e02dbdaf2841811ef54036a0877
+    m_Address: English (New Zealand) (en-NZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e456ccc800bb0b4aab856ff0784a5af
+    m_Address: Belarusian (Belarus) (be-BY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e4a254f85ad40a459fab954ff2f94cb
+    m_Address: Indonesian (Indonesia) (id-ID)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e6a5b83b30123446b9455063e1bbec0
+    m_Address: Norwegian Nynorsk (Norway) (nn-NO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ed64fb24998eb44eb770c7ec2358b28
+    m_Address: English (United States) (en-US)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f9dba9fbcbff2845b3af79c44d8e27b
+    m_Address: French (Monaco) (fr-MC)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40d1ff5d45ff30647a40571fa2d89f28
+    m_Address: Oromo (om)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41a61d57caee69b43bcdcde121ee5b40
+    m_Address: Catalan (Spain) (ca-ES-valencia)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 42091eb89420183438c7767ffa561cec
+    m_Address: Tibetan (China) (bo-CN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 423236adccb29cd4699ddefa0a7682be
+    m_Address: Arabic (Lebanon) (ar-LB)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43d6781105c9fe344b2f9bce18b923db
+    m_Address: German (Luxembourg) (de-LU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 44392640f17d8894a8e70a6ba93fbd23
+    m_Address: English (en)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 45045011c3a8624409aa1c59ffff5d51
+    m_Address: French (France) (fr-FR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 490084917c8f54e42bbc57613b5eae25
+    m_Address: Odia (India) (or-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4967f36d736c54944a80e946a3a98670
+    m_Address: Chinese (Traditional) (zh-Hant)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c80f88b5f23d6c478331af7872f80ef
+    m_Address: Azerbaijani (Latin, Azerbaijan) (az-Latn-AZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c9f3fd6f2e89ec4e9fd3272c59b5a61
+    m_Address: Catalan (ca)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4cffa31fdb3a6f44d9f3684c24df03f7
+    m_Address: Tatar (tt)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4d29268bc95583146a42e4749344487f
+    m_Address: Lithuanian (Lithuania) (lt-LT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4e3f33d2b0bc83b43997b5dfee36e581
+    m_Address: Burmese (my)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ea13c59017b2e9458d0b44acf746206
+    m_Address: Romanian (Romania) (ro-RO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f5e28d60482b2c4b969142957f9b3f1
+    m_Address: French (Switzerland) (fr-CH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4fc3cd52ef3f7314b85d0f1d0b2be1ba
+    m_Address: Northern Sotho (nso)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 509696469b9dc444ab20c66f78a51a76
+    m_Address: Spanish (Uruguay) (es-UY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 511e58809cf471b45a3404704a82e564
+    m_Address: Fulah (ff)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51c5a662313aa7141b148d6cd49e5322
+    m_Address: Arabic (Saudi Arabia) (ar-SA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 52563cbd9b1fdbe4eb619ccf3f204eb7
+    m_Address: Mongolian (Cyrillic) (mn-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 52712712fd7806843af3b6de1e6b831b
+    m_Address: Central Atlas Tamazight (Latin) (tzm-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53578533a7233d94ba772f061e347db3
+    m_Address: Khmer (km)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53e9bd632bef09143a38f598ea02a64e
+    m_Address: Estonian (Estonia) (et-EE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54fa3459655d3194db525f358d9cdf3e
+    m_Address: Chinese (Simplified) (zh-Hans)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 555fad8c2bfc39144ac2e03d49fc3d59
+    m_Address: Swedish (sv)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 575b57a294805154f98efa067fe958ba
+    m_Address: Burmese (Myanmar (Burma)) (my-MM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 579c21551f4b41c478cfbcc493e5cfe9
+    m_Address: Czech (Czech Republic) (cs-CZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 596635e146199f64988f3f32e0696791
+    m_Address: Nepali (India) (ne-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a277b5772af678408620f5545493d48
+    m_Address: Indonesian (id)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d390712a686a03479a024144842220f
+    m_Address: English (Philippines) (en-PH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d5dfbecf09ed4f4fbc8b10fb1aaf1c1
+    m_Address: Northern Sotho (South Africa) (nso-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d7ae387025352047b0f941afecaffb3
+    m_Address: English (Jamaica) (en-JM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5eaf3c2240af30f46b3679637f5071dc
+    m_Address: Luxembourgish (Luxembourg) (lb-LU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 623fd711cb3d65342bfe0e6e3a3fbce6
+    m_Address: Pashto (ps)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 639ae4236928feb4ca6b81707dd0c8db
+    m_Address: Croatian (Bosnia & Herzegovina) (hr-BA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 64af4a8cbb5fbb948b1a9365a681c0d3
+    m_Address: Lao (Laos) (lo-LA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 64b232a34657aaf49b1fc6339d4ff231
+    m_Address: Bosnian (Latin, Bosnia & Herzegovina) (bs-Latn-BA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6567a64dcb1b54344887100cf38559fe
+    m_Address: Romansh (rm)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65951fb21547fe8499f61f4fdaf1a5d3
+    m_Address: Spanish (Peru) (es-PE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65f4b8d2f49abb04f951e124b81b5cc8
+    m_Address: Swedish (Sweden) (sv-SE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67c595720515e934bbfbec195b9b5a1e
+    m_Address: Arabic (Iraq) (ar-IQ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67caeec156760954d90fc5934df8ccf3
+    m_Address: Romansh (Switzerland) (rm-CH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6826d11191e2edc4aa9a55f53d9d8189
+    m_Address: Filipino (Philippines) (fil-PH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 686ea5ddf046da641a5800aef7bdb626
+    m_Address: Yoruba (Nigeria) (yo-NG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 698a28a0c94f79b49aa5634295a3c7e6
+    m_Address: Italian (Switzerland) (it-CH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69af61cc701d94541829bf1dec531de2
+    m_Address: Hindi (India) (hi-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69bec523791971b428d9e6c5fddd1211
+    m_Address: "French (C\xF4te d\u2019Ivoire) (fr-CI)"
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a308c61e87112a4c99ee704db128323
+    m_Address: Spanish (Puerto Rico) (es-PR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a3fd34445c7a7b468897e88ccba3bb3
+    m_Address: Filipino (fil)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a90d0beae995cd4aa299763f9ffdd8b
+    m_Address: Slovenian (sl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6aefdd18a734c7e41bc614ba02c53d7c
+    m_Address: Gujarati (India) (gu-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b0481fd220d3f0428a6749f8e64f069
+    m_Address: Kinyarwanda (rw)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b896dabccdc815469f8ec200dd6673c
+    m_Address: Spanish (Honduras) (es-HN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f828d9ef6288c84d8d8228275da9985
+    m_Address: Finnish (fi)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 707bdc0306c8c7d4e8754f86eaa49967
+    m_Address: Swahili (Kenya) (sw-KE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72032689218916a4a8b491944ca11e27
+    m_Address: Dutch (Belgium) (nl-BE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7283ceb94edf67a47b3211747e7ed928
+    m_Address: Tamil (Sri Lanka) (ta-LK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72a9425aed9bd9340a8b135bdd417c98
+    m_Address: Maltese (mt)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73a64892743e59e4899bc18d0b1e3a6a
+    m_Address: Armenian (hy)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74062af19fda8db459b26e3a885f4827
+    m_Address: Malayalam (India) (ml-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74556edcf4b5da9458b1c41484e3d147
+    m_Address: English (Australia) (en-AU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74fba0e4716af1847b31621e0b44e2a9
+    m_Address: Urdu (ur)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7575c2037e196244ca11d44bf49caa5c
+    m_Address: Persian (fa)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77a9d2b86127b6e4dbdaef016967fe6d
+    m_Address: Norwegian (no)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 795ee0073ca4e4548a20ff48ed2d364e
+    m_Address: Tamil (ta)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79d0d2d36b15329489d3b571c2b297b4
+    m_Address: Bangla (India) (bn-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79d5f8e863e0e2449ac26d8925aec53e
+    m_Address: Thai (th)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a35f3de1720e6946b1d01f5ed54f3f5
+    m_Address: Russian (Moldova) (ru-MD)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7af7306a992a7dc4b957b8d98062e6cc
+    m_Address: Azerbaijani (az)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7b981d195cb10f14da569b98bdfd6cc1
+    m_Address: Chinese (Traditional) (zh-TW)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e8f70da8996bb44695cd195d7cb1add
+    m_Address: Sinhala (Sri Lanka) (si-LK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7eb1cdf0ef0d39044bb7c327a7dc2054
+    m_Address: Korean (ko)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ecdf570477c1e54687320c64ca9b47b
+    m_Address: Latvian (lv)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7efecf1a642eec14bbe4a60db69c48e7
+    m_Address: Arabic (ar)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 800e92a98fe2aad4bb1454457b96b1b4
+    m_Address: Czech (cs)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 808fa242719660c408a77aba6e5cfa80
+    m_Address: Scottish Gaelic (gd)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80f44364c1f362f4f9f6f1e04c5a2e35
+    m_Address: Uzbek (Latin, Uzbekistan) (uz-Latn-UZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 818eb131a48f55643b481169cae7e781
+    m_Address: Assamese (India) (as-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 828c7ce22c5ee6a45b514faafbf60df1
+    m_Address: Afrikaans (South Africa) (af-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82ec1f2b7e52f314393fe1a005e5e379
+    m_Address: Marathi (mr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 833f5b9927148f14aa6c8af76546e91c
+    m_Address: Chinese (Simplified) (zh)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 83a625fc6c96b124d9d81f7a904186ca
+    m_Address: Ukrainian (uk)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 855e19ba1c2a2864eb8a086b887fb356
+    m_Address: English (Belize) (en-BZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8600ba62951499d43bd19ba5c6d79afe
+    m_Address: Northern Sami (Norway) (se-NO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86522b79b2c016541b4f892ba80d1a5c
+    m_Address: English (Ireland) (en-IE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8864f10584768694faaa05aea8f20e49
+    m_Address: Punjabi (pa)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 892db2f047642cc4892d607c9554d8ce
+    m_Address: Sakha (Russia) (sah-RU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8987eb03c587ca04bbdaac67b9ce6126
+    m_Address: Portuguese (Portugal) (pt-PT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c91116b5b9cd1f43a30aabfb543140c
+    m_Address: Serbian (sr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c920872df9684f49b5bfa3dad4324a3
+    m_Address: Somali (so)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d2d644dc3e1e3d449cbf3118f15764e
+    m_Address: Uzbek (Cyrillic) (uz-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d4f3b1284e0b3e41bd505d30b0d196a
+    m_Address: Hebrew (Israel) (he-IL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ea6b744c703f644ba819260450a1658
+    m_Address: Bosnian (Latin) (bs-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9078d6ee30d18204984ed889437bb79e
+    m_Address: Ukrainian (Ukraine) (uk-UA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 90a5f85bdfbb0564a8faaa599894ccb3
+    m_Address: Spanish (El Salvador) (es-SV)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 91c42c45aa8759642b4c9d9b311fcd02
+    m_Address: Chinese (Traditional, Macau SAR China) (zh-MO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9282bd59760985d4492b5dcdcd9af9c4
+    m_Address: Nepali (ne)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92f5dacbd8624954781f2c025e00cf16
+    m_Address: Uzbek (Latin) (uz-Latn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 93923b4cf309a8d409b0d0c99874fd77
+    m_Address: Bulgarian (Bulgaria) (bg-BG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 94c0092ba0ce39f468d7a66529f013d7
+    m_Address: Arabic (Kuwait) (ar-KW)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 955ff78f363e3934eb01eadb847adbc8
+    m_Address: Tigrinya (ti)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 957aedf086daa51448729206642649e4
+    m_Address: Serbian (Cyrillic, Bosnia & Herzegovina) (sr-Cyrl-BA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 966047966968c6b47af8e5011f0d66e4
+    m_Address: French (Cameroon) (fr-CM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96e9e4e162f95c84586ee34b80349e66
+    m_Address: Swahili (sw)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97a39430486ef5d47a7fc3028793fa51
+    m_Address: Arabic (Qatar) (ar-QA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9829e6dabf1c4fb4c8b53e79f7de8c9d
+    m_Address: English (Canada) (en-CA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98d3b49cb38680a40b828b405b8c75be
+    m_Address: Faroese (Faroe Islands) (fo-FO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98ed035eb93beb44a93d076023be6fdd
+    m_Address: English (Malaysia) (en-MY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99876e82a03c59b4db3030ea611f4598
+    m_Address: Malay (Brunei) (ms-BN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b950aefa4a7c15449ca9e2a6fc4d1c3
+    m_Address: Croatian (Croatia) (hr-HR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c38cfdd6b6e17d46bec3b6a282fee43
+    m_Address: Arabic (Algeria) (ar-DZ)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9cfde84e9baf10f43b023a9fb1bab987
+    m_Address: Igbo (Nigeria) (ig-NG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9db842deeaebd18449c7e17308a84db2
+    m_Address: Inari Sami (smn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e13d21400ed0904d994a757754814bf
+    m_Address: Hindi (hi)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e8bd84cea377b0468c8827d406b2c50
+    m_Address: Malay (Malaysia) (ms-MY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e8dbc3e7f7031349ad4c95769ec287d
+    m_Address: Tswana (Botswana) (tn-BW)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ebb630afb0b1bb4bb291f4e7405d930
+    m_Address: Chinese (Traditional, Hong Kong SAR China) (zh-HK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f57ce8954fd48f49bcec43b681d0874
+    m_Address: Afrikaans (af)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a087c64454e6b6c428b135b3e22f0623
+    m_Address: Serbian (Latin, Montenegro) (sr-Latn-ME)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a149664290242404fb84e094265dbd0a
+    m_Address: Slovenian (Slovenia) (sl-SI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a2a20d13075514346ac5241feff43471
+    m_Address: Tigrinya (Eritrea) (ti-ER)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a366501ab6c2fd94080c985892e2e36f
+    m_Address: Western Frisian (fy)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a5881736ed9c99f45b26aa02f4cf794d
+    m_Address: Breton (br)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a58a0b6bf302a9b43b5388ecc51028b5
+    m_Address: Korean (South Korea) (ko-KR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a5e25c27e8832e744ab4b03c1f8054de
+    m_Address: Urdu (India) (ur-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a5e2fecb93d14874fb12adb268a26e29
+    m_Address: Persian (Iran) (fa-IR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a6250760157398b4c85b7ae01de08ea2
+    m_Address: Swedish (Finland) (sv-FI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a6aa70561fe8b2f4a9dbe8c7b7c5c438
+    m_Address: Chinese (Simplified) (zh-CN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7170dc1cb7918b4b9fd2ff3010d9e31
+    m_Address: Mongolian (Mongolia) (mn-MN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a74f172ee9b92aa429cdb7bb9ae16920
+    m_Address: German (Liechtenstein) (de-LI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7b7b084a70db044aa1deb6ccafc7687
+    m_Address: Armenian (Armenia) (hy-AM)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7b8b83e5d869c544a4e7856f6ba27cf
+    m_Address: Kazakh (kk)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8acec328fb580b4785ee4135520ba37
+    m_Address: Spanish (Mexico) (es-MX)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aacf354e722d8a845b2152daf81e5d7b
+    m_Address: Uyghur (ug)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab11345d4125ad84386ebc01ac08fd60
+    m_Address: Spanish (Chile) (es-CL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac25af32963bd02458bcd2f614e36620
+    m_Address: Finnish (Finland) (fi-FI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: accbde320d30ee64b918e46a1d1e98c1
+    m_Address: French (Belgium) (fr-BE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aeb983a3a2fc3504ca7f78df237211d2
+    m_Address: Bosnian (Cyrillic) (bs-Cyrl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aedf12ae3433f9041a83df4f2427e161
+    m_Address: Galician (Spain) (gl-ES)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af44c27c7319db14f82ada7130172c73
+    m_Address: Serbian (Cyrillic, Serbia) (sr-Cyrl-RS)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afad633182f0ab343a2ac7e625290635
+    m_Address: Greek (Greece) (el-GR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0ece17030b63f147b4f4948bb031436
+    m_Address: Tigrinya (Ethiopia) (ti-ET)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1bb4e688745dc54bb38dca58c06fc5a
+    m_Address: Faroese (fo)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1e55285ce491a84a8d3b1d5e72329f9
+    m_Address: Vietnamese (vi)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b244830a907a252449c86645e8cbff4b
+    m_Address: Romanian (ro)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b75f25c2e65e8ae4aa22c8f421dc8cad
+    m_Address: Spanish (United States) (es-US)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7b36d0b1dcf7ea4f876eb0e0c15974e
+    m_Address: Tswana (South Africa) (tn-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b91e904011f84fd4abf5fb66da8beddb
+    m_Address: Northern Sami (Sweden) (se-SE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b93f23d095633044b8614895dd6d5ec1
+    m_Address: Kannada (kn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b969cd315ca9377429dc3b5846db4efb
+    m_Address: Portuguese (pt)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b98c03bebc83ca54abcde90280033a87
+    m_Address: Hausa (ha)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ba46ada5e07b25c41b837c977a3610b5
+    m_Address: Vietnamese (Vietnam) (vi-VN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ba592edfdf7dd164fa8e7c09fced4562
+    m_Address: Bangla (Bangladesh) (bn-BD)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: baa7e2455fb7b6546b7d72ee8402ce99
+    m_Address: Odia (or)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: baab641fbf5db894e88b1cd3c3dfaeec
+    m_Address: English (Singapore) (en-SG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bb07658f68f4d3441ae15a9fbb88af55
+    m_Address: Kyrgyz (ky)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bba44640551ecb849a79ce6251fd684d
+    m_Address: Kalaallisut (Greenland) (kl-GL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc46c52770a3b0d46b4f3e5fad70f44b
+    m_Address: Bosnian (Cyrillic, Bosnia & Herzegovina) (bs-Cyrl-BA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bcd36e7fb9a0ee149a262de0b3124d43
+    m_Address: French (Senegal) (fr-SN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bd16e882839b487448e77a62aea2726d
+    m_Address: Swiss German (France) (gsw-FR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf71dac4ba0cf804fa1c2def03c93257
+    m_Address: Thai (Thailand) (th-TH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0b23f35e6ede724989ae4f16bf633e3
+    m_Address: Arabic (Bahrain) (ar-BH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0e2af1559de0aa42a16ce38a675927f
+    m_Address: Nepali (Nepal) (ne-NP)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c20a2926d6308664ca9d1377a543c1cc
+    m_Address: Tamil (India) (ta-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c247123dbe5346a4eae80eee0b266fcb
+    m_Address: Irish (ga)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c322770ae68ae7f4ca7e77622062b2e8
+    m_Address: Sichuan Yi (China) (ii-CN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c32503e93ddb0bd4788881b606b7ad60
+    m_Address: Arabic (Egypt) (ar-EG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c3a105785ec7a4b489f7be4d81537a50
+    m_Address: Hausa (Latin, Nigeria) (ha-Latn-NG)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c42d39c7f34a5d94e998820050af3226
+    m_Address: Polish (pl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c518db13165ac7746812d5137325a67d
+    m_Address: Albanian (Albania) (sq-AL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7dfc8f69fca0ee4d89a81b24a93a6eb
+    m_Address: Telugu (te)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8fa379c936dc584285a3d2edf764e7b
+    m_Address: Spanish (Ecuador) (es-EC)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c90d0c40807f33742afb9284f0054790
+    m_Address: Japanese (Japan) (ja-JP)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c95ad220e4035fb429d2589731e49215
+    m_Address: English (Trinidad & Tobago) (en-TT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9e4c95206549ad40929243c1b6133be
+    m_Address: Serbian (Cyrillic, Montenegro) (sr-Cyrl-ME)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca65e0dc6b8e17040a39ac89ec1e70f5
+    m_Address: Somali (Somalia) (so-SO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc524a5153f6d3244b6b05e6ecb24dd6
+    m_Address: Northern Sami (Finland) (se-FI)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd81f2ae7f57f2547942b71e462881da
+    m_Address: Assamese (as)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce20a620a1a7e3e4c90d026a376cfa24
+    m_Address: Lower Sorbian (dsb)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf444be454f6961469823b6d4376f47a
+    m_Address: Kinyarwanda (Rwanda) (rw-RW)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf5ffaa870cc07343b6db92fc63f9ec9
+    m_Address: Punjabi (Arabic, Pakistan) (pa-Arab-PK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf8858c4cc503ab419140c1e449d8510
+    m_Address: Gujarati (gu)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d080b823747980246a97c13bb38a9391
+    m_Address: Portuguese (Brazil) (pt-BR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1257e2756ee63d4697a9e07898a42ad
+    m_Address: Amharic (am)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d16f7538b166ce34382a15f388db2b6d
+    m_Address: Spanish (Cuba) (es-CU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1c43ebceffad1f4685a5c534e1c1222
+    m_Address: Slovak (sk)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2d57447c407c7d4fa2d25059b766cbb
+    m_Address: Xhosa (South Africa) (xh-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d30ebefdbeb04bd4a897f31813a29917
+    m_Address: Spanish (Venezuela) (es-VE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3137f991d5749747b68d551924f374c
+    m_Address: Western Frisian (Netherlands) (fy-NL)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3b1b57a705d5134794152b7ce0f6576
+    m_Address: Spanish (Panama) (es-PA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3cfce68cd617b44ea80052ea5755bde
+    m_Address: Scottish Gaelic (United Kingdom) (gd-GB)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3d8b7ca90471284e9057653c59dbdbf
+    m_Address: Tswana (tn)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4573a27b068b09479f049d97414c50d
+    m_Address: Irish (Ireland) (ga-IE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5058486f4334104f96d58191908edff
+    m_Address: Southern Sotho (South Africa) (st-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d55ddc70b94f83445890d023d87f4634
+    m_Address: Hebrew (he)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d68e65f0d5b4c98448bab27a8c845c95
+    m_Address: Spanish (Colombia) (es-CO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d7643f3a044658340ab050883bad440e
+    m_Address: Tsonga (South Africa) (ts-ZA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d8004b3e3bb765b43b139bafb49b7b47
+    m_Address: Galician (gl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d846486a6bd03034abfd30ceb80b5163
+    m_Address: Romanian (Moldova) (ro-MD)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dabcd5f1fdc948943a8c2c79018ce96a
+    m_Address: Belarusian (be)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: daee267052fa9d3478536623523010b0
+    m_Address: Russian (Russia) (ru-RU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dbd3cff1cd3882845a6ca1f4f2809f2a
+    m_Address: Telugu (India) (te-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd313b1ae38961c4db4edd68df05f797
+    m_Address: Turkish (tr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: deb517feb25785c4fa5192f85764c080
+    m_Address: Central Atlas Tamazight (tzm)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2356a97d584f3a4da9018520f7d324f
+    m_Address: Hungarian (hu)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e28c3636e2e034e46846f658b0eacf2f
+    m_Address: Amharic (Ethiopia) (am-ET)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e310930d8fb27da45a00c5b9d6cb92a3
+    m_Address: Arabic (Libya) (ar-LY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3119a54418ea5e42b9d5f3706b366df
+    m_Address: Malay (ms)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e33ed0d0b866caa4da60667e8e70243d
+    m_Address: Lao (lo)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e40a7c5caef63844a825fd42fd17a251
+    m_Address: Danish (Denmark) (da-DK)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e53f1ea63e0c9114bb8664278f1cf511
+    m_Address: Spanish (Costa Rica) (es-CR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5bb0133167788b4cb90eb63f4b21f72
+    m_Address: Welsh (United Kingdom) (cy-GB)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e72dac4df8ecfb140b26d6bb3e9b5d6a
+    m_Address: Macedonian (mk)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e758b00a899ebde44ba9c1d8994c1e46
+    m_Address: "Norwegian Bokm\xE5l (nb)"
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e76efa743ddf0a9458788868b4370fd6
+    m_Address: Serbian (Latin, Bosnia & Herzegovina) (sr-Latn-BA)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e809634d9388a0546af244d501bd5ba3
+    m_Address: Arabic (United Arab Emirates) (ar-AE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e94f45f54c4793c488ac4a59b4deec7f
+    m_Address: Spanish (Spain) (es-ES)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea5fb751cb851c545917d65ddcdc2dee
+    m_Address: Catalan (Spain) (ca-ES)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eab8a7b7024f7e540aa6f07032713bd8
+    m_Address: Tsonga (ts)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eabea0ac2a984ab41a3ff15eb53dffce
+    m_Address: Sichuan Yi (ii)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eb1b7bc4748ea87468f9c91b22820c4d
+    m_Address: Kannada (India) (kn-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eb9db116e59442041bcc732c0d9f1bbf
+    m_Address: "Norwegian Bokm\xE5l (Norway) (nb-NO)"
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eba3d9294de6d364c81dc79530be0476
+    m_Address: German (Austria) (de-AT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec34d552dd717954c8e19acf3f3bd9f5
+    m_Address: Spanish (Bolivia) (es-BO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ecb02b41847c56048baa2cec04faabf8
+    m_Address: Greek (el)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eccdbaa06895c664fb6f7e30fb43f456
+    m_Address: German (Germany) (de-DE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee6c73accb1c29a4b9bb7d71cdedb8c8
+    m_Address: German (Switzerland) (de-CH)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef84715a882a6a649ae0d062af06ba6a
+    m_Address: French (fr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f0cc313bb20d2ac4b8c7a33c04bb7408
+    m_Address: Lower Sorbian (Germany) (dsb-DE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f19c4fccc0c0f7645a94987236172775
+    m_Address: Estonian (et)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f202e1b266963c4459d17bc02eab5d8a
+    m_Address: Icelandic (Iceland) (is-IS)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2914b99afee20342b77b56cf8a0fd1a
+    m_Address: Georgian (Georgia) (ka-GE)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2f2ffbb86dc3a7409eb33430f28ceaf
+    m_Address: Arabic (Syria) (ar-SY)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f39c8bbc9b5319746b90bc78a5741ad3
+    m_Address: Upper Sorbian (hsb)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4b9d1e9946dcd94c80eb45dad256cbb
+    m_Address: Turkmen (tk)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f62e502e2b230134f911a050b8712226
+    m_Address: Arabic (Jordan) (ar-JO)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6a74343f09acae429db80a9a40cbe47
+    m_Address: Kalaallisut (kl)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f7f41c7f92359a147898ed7171906348
+    m_Address: Tatar (Russia) (tt-RU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8ae4ca42c87bdf478f0d77b7dc34576
+    m_Address: Southern Sotho (st)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9065c5620f798b428dad65d03dc713e
+    m_Address: Luxembourgish (lb)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f93902f71eb7ca14ba34311eba402465
+    m_Address: Konkani (India) (kok-IN)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fbafa35ac439b30448c0d74944f57807
+    m_Address: Maltese (Malta) (mt-MT)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc6fde010796945409e3d2830caa116d
+    m_Address: Georgian (ka)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fca50294be2fe2845be0b311df9d6de6
+    m_Address: Sakha (sah)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fda886e34d417a640bcf5ca46f462ba0
+    m_Address: Italian (it)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fe95f7134c2498947916a54c268a3731
+    m_Address: Basque (Spain) (eu-ES)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 1
+  m_Settings: {fileID: 11400000, guid: fb6d75f6d260c8242a778d8de51a2f99, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 8d6b1520af1212b41ba6a8dcb74a7875, type: 2}
+    - {fileID: 11400000, guid: 42121d1de39567942aace1c35f74a1f9, type: 2}

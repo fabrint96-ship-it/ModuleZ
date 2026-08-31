@@ -224,6 +224,8 @@ GameObject:
   - component: {fileID: 984936594}
   - component: {fileID: 984936592}
   - component: {fileID: 984936593}
+  - component: {fileID: 984936596}
+  - component: {fileID: 984936595}
   m_Layer: 0
   m_Name: ModuleZ_Runtime
   m_TagString: Untagged
@@ -294,6 +296,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85dcd23804c5eb9428f84fb62c287dd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.UI.Runtime.ModuleZUIManager
+--- !u!114 &984936595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984936589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33cd8b8b3d3e778499638ed3de0286f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.Core.SaveSystem.ModuleZAutoSaveController
+--- !u!114 &984936596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984936589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6404fcc0918a3f42b6c7715dea0e77c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.Core.SaveSystem.ModuleZSaveBootstrap
 --- !u!1 &2095385661
 GameObject:
   m_ObjectHideFlags: 0

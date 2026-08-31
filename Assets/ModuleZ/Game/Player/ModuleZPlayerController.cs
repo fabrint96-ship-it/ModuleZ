@@ -31,6 +31,9 @@ namespace ModuleZ.Game.Player
             if (ModuleZGameState.IsPaused)
                 return;
 
+            if (ModuleZGameState.IsOverlayOpen)
+                return;
+
             if (OpenWorldMessageHUD.Instance != null &&
                 OpenWorldMessageHUD.Instance.IsShowingDialogue())
                 return;

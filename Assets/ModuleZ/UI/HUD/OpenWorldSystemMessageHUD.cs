@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using ModuleZ.Core.Theme;
 
 namespace ModuleZ.UI.HUD
 {
@@ -8,92 +10,117 @@ namespace ModuleZ.UI.HUD
         public static OpenWorldSystemMessageHUD Instance { get; private set; }
 
         private Canvas canvas;
-        private GameObject backgroundObj;
+        private GameObject panelObj;
         private Text messageText;
-        private float hideTime;
+        private Coroutine hideRoutine;
 
         private void Awake()
         {
             Instance = this;
-            CreateHUD();
+            BuildHUD();
+            HideInstant();
         }
 
-        private void Update()
+        private void OnDestroy()
         {
-            if (hideTime > 0f && Time.time >= hideTime)
-                Hide();
+            if (Instance == this)
+                Instance = null;
         }
 
-        private void CreateHUD()
+        public void Show(string message, float duration = 3f)
         {
-            GameObject canvasObj = new GameObject("Canvas_OpenWorldSystemMessageHUD");
+            if (canvas == null)
+                BuildHUD();
+
+            if (hideRoutine != null)
+                StopCoroutine(hideRoutine);
+
+            messageText.text = message;
+            panelObj.SetActive(true);
+
+            hideRoutine = StartCoroutine(HideAfter(duration));
+        }
+
+        private IEnumerator HideAfter(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            HideInstant();
+        }
+
+        private void HideInstant()
+        {
+            if (panelObj != null)
+                panelObj.SetActive(false);
+        }
+
+        private void BuildHUD()
+        {
+            GameObject canvasObj = new GameObject("OpenWorldSystemMessageHUD");
             canvasObj.transform.SetParent(transform, false);
 
             canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 2000;
+            canvas.sortingOrder = 1400;
 
             CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
             canvasObj.AddComponent<GraphicRaycaster>();
 
-            backgroundObj = new GameObject("System_Message_Background");
-            backgroundObj.transform.SetParent(canvasObj.transform, false);
+            CreatePanel(canvas.transform);
+            CreateText(panelObj.transform);
+        }
 
-            Image bg = backgroundObj.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.82f);
+        private void CreatePanel(Transform parent)
+        {
+            panelObj = new GameObject("SystemMessagePanel");
+            panelObj.transform.SetParent(parent, false);
 
-            RectTransform bgRect = backgroundObj.GetComponent<RectTransform>();
-            bgRect.anchorMin = new Vector2(0.5f, 0.5f);
-            bgRect.anchorMax = new Vector2(0.5f, 0.5f);
-            bgRect.pivot = new Vector2(0.5f, 0.5f);
-            bgRect.sizeDelta = new Vector2(950f, 120f);
-            bgRect.anchoredPosition = Vector2.zero;
+            Image image = panelObj.AddComponent<Image>();
+            image.color = new Color(0.02f, 0.04f, 0.08f, 0.88f);
 
-            GameObject textObj = new GameObject("System_Message_Text");
-            textObj.transform.SetParent(backgroundObj.transform, false);
+            RectTransform rect = panelObj.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 1f);
+            rect.anchorMax = new Vector2(0.5f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -35f);
+            rect.sizeDelta = new Vector2(780f, 86f);
+
+            GameObject accentObj = new GameObject("AccentLine");
+            accentObj.transform.SetParent(panelObj.transform, false);
+
+            Image accent = accentObj.AddComponent<Image>();
+            accent.color = ModuleZ70sPalette.UIAccent;
+
+            RectTransform accentRect = accentObj.GetComponent<RectTransform>();
+            accentRect.anchorMin = new Vector2(0f, 0f);
+            accentRect.anchorMax = new Vector2(0f, 1f);
+            accentRect.pivot = new Vector2(0f, 0.5f);
+            accentRect.sizeDelta = new Vector2(8f, 0f);
+            accentRect.anchoredPosition = Vector2.zero;
+        }
+
+        private void CreateText(Transform parent)
+        {
+            GameObject textObj = new GameObject("SystemMessageText");
+            textObj.transform.SetParent(parent, false);
 
             messageText = textObj.AddComponent<Text>();
             messageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            messageText.fontSize = 38;
+            messageText.fontSize = 25;
+            messageText.fontStyle = FontStyle.Bold;
             messageText.alignment = TextAnchor.MiddleCenter;
-            messageText.color = Color.white;
-            messageText.text = "";
+            messageText.color = ModuleZ70sPalette.UIText;
+            messageText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            messageText.verticalOverflow = VerticalWrapMode.Truncate;
 
-            RectTransform textRect = textObj.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
-
-            backgroundObj.SetActive(false);
-        }
-
-        public void Show(string message, float duration)
-        {
-            if (backgroundObj != null)
-                backgroundObj.SetActive(true);
-
-            if (messageText != null)
-                messageText.text = message;
-
-            hideTime = Time.time + duration;
-
-            Debug.Log("[Module Z System HUD] " + message);
-        }
-
-        private void Hide()
-        {
-            hideTime = 0f;
-
-            if (messageText != null)
-                messageText.text = "";
-
-            if (backgroundObj != null)
-                backgroundObj.SetActive(false);
+            RectTransform rect = textObj.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(25f, 8f);
+            rect.offsetMax = new Vector2(-25f, -8f);
         }
     }
 }

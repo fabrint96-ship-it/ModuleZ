@@ -10,6 +10,7 @@ namespace ModuleZ.Game.Player
         {
             GameObject root = new GameObject("Player_Humano_Cubico");
             root.transform.position = position;
+            root.tag = "Player";
 
             CharacterController controller = root.AddComponent<CharacterController>();
             root.AddComponent<ModuleZPlayerInteraction>();
@@ -20,7 +21,47 @@ namespace ModuleZ.Game.Player
 
             CreateBodyPart("Cabeza", root.transform, new Vector3(0f, 1.65f, 0f), new Vector3(0.45f, 0.45f, 0.45f), new Color(0.82f, 0.62f, 0.45f));
 
-            GameObject torso = CreateBodyPart("Torso", root.transform, new Vector3(0f, 1.05f, 0f), new Vector3(0.65f, 0.75f, 0.35f), new Color(0.12f, 0.28f, 0.55f));
+            CreateBodyPart(
+                "Pelo_70s",
+                root.transform,
+                new Vector3(0f, 1.92f, 0f),
+                new Vector3(0.52f, 0.18f, 0.52f),
+                new Color(0.10f, 0.06f, 0.03f)
+            );
+
+            CreateBodyPart(
+                "Patilla_Izq",
+                root.transform,
+                new Vector3(-0.24f, 1.70f, 0f),
+                new Vector3(0.06f, 0.18f, 0.06f),
+                new Color(0.10f, 0.06f, 0.03f)
+            );
+
+            CreateBodyPart(
+                "Patilla_Der",
+                root.transform,
+                new Vector3(0.24f, 1.70f, 0f),
+                new Vector3(0.06f, 0.18f, 0.06f),
+                new Color(0.10f, 0.06f, 0.03f)
+            );
+
+            CreateBodyPart(
+                "Ojo_Izq",
+                root.transform,
+                new Vector3(-0.12f, 1.68f, 0.24f),
+                new Vector3(0.06f, 0.06f, 0.03f),
+                Color.black
+            );
+
+            CreateBodyPart(
+                "Ojo_Der",
+                root.transform,
+                new Vector3(0.12f, 1.68f, 0.24f),
+                new Vector3(0.06f, 0.06f, 0.03f),
+                Color.black
+            );
+
+            GameObject torso = CreateBodyPart("Torso", root.transform, new Vector3(0f, 1.05f, 0f), new Vector3(0.65f, 0.75f, 0.35f), new Color(0.58f, 0.42f, 0.18f));
 
             GameObject leftArm = CreateBodyPart("Brazo_Izq", root.transform, new Vector3(-0.48f, 1.1f, 0f), new Vector3(0.22f, 0.7f, 0.22f), new Color(0.82f, 0.62f, 0.45f));
 

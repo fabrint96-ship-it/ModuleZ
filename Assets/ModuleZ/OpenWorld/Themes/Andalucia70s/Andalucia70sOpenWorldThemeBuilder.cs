@@ -1,3 +1,4 @@
+using ModuleZ.OpenWorld.Builders;
 using UnityEngine;
 
 namespace ModuleZ.OpenWorld.Themes.Andalucia70s
@@ -10,6 +11,8 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             gameObject.AddComponent<Andalucia70sOpenWorldGroundBuilder>().Build();
             gameObject.AddComponent<Andalucia70sOpenWorldBuildingBuilder>().Build();
             gameObject.AddComponent<Andalucia70sOpenWorldPropsBuilder>().Build();
+            gameObject.AddComponent<OpenWorldRoadPropsBuilder>().Build();
+            gameObject.AddComponent<OpenWorldBoundaryWallBuilder>().Build();
             gameObject.AddComponent<Andalucia70sOpenWorldNPCBuilder>().Build();
 
             Debug.Log("[Module Z] Theme OpenWorld Andalucía años 70 construido.");

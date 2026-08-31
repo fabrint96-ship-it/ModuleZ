@@ -1,10 +1,12 @@
-using ModuleZ.Core.SceneLoading;
+using System.Collections;
+using ModuleZ.Core.Managers;
 using ModuleZ.Core.SaveSystem;
+using ModuleZ.Core.SceneLoading;
+using ModuleZ.Core.Theme;
+using ModuleZ.OpenWorld.Runtime;
+using ModuleZ.UI.HUD;
 using UnityEngine;
 using UnityEngine.UI;
-using ModuleZ.Core.Managers;
-using ModuleZ.OpenWorld.Runtime;
-using System.Collections;
 
 namespace ModuleZ.UI.PauseMenu
 {
@@ -17,8 +19,17 @@ namespace ModuleZ.UI.PauseMenu
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
-                TogglePause();
+            if (!Input.GetKeyDown(KeyCode.Escape))
+                return;
+
+            if (ModuleZHUDOverlayCoordinator.Instance != null &&
+                ModuleZHUDOverlayCoordinator.Instance.HasOpenOverlay())
+            {
+                ModuleZHUDOverlayCoordinator.Instance.CloseAllOverlays();
+                return;
+            }
+
+            TogglePause();
         }
 
         private void TogglePause()
@@ -87,7 +98,7 @@ namespace ModuleZ.UI.PauseMenu
             bgObj.transform.SetParent(pauseCanvas.transform, false);
 
             Image bg = bgObj.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.color = ModuleZ70sPalette.UIBackground;
 
             RectTransform rect = bgObj.GetComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
@@ -108,7 +119,7 @@ namespace ModuleZ.UI.PauseMenu
             title.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             title.fontSize = 46;
             title.alignment = TextAnchor.MiddleCenter;
-            title.color = Color.white;
+            title.color = ModuleZ70sPalette.UIText;
 
             RectTransform rect = titleObj.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(0.5f, 0.5f);

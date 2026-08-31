@@ -3,13 +3,15 @@ using ModuleZ.Core.SceneLoading;
 using ModuleZ.Game.Animation;
 using ModuleZ.Game.Interaction;
 using ModuleZ.UI.HUD;
-using ModuleZ.Duel.Runtime;
 using UnityEngine;
 
 namespace ModuleZ.OpenWorld.Encounters
 {
     public class DuelStarterInteractable : ModuleZInteractable
     {
+        [Header("Rematch")]
+        public bool allowRematchWhenDefeated = true;
+
         public ModuleZRivalId rivalId = ModuleZRivalId.Madrid;
 
         private bool duelStarting;
@@ -24,47 +26,84 @@ namespace ModuleZ.OpenWorld.Encounters
             if (duelStarting)
                 return;
 
+            if (!ModuleZRivalProgression.IsRivalUnlocked(rivalId))
+            {
+                ShowMessage(
+                    ModuleZRivalProgression.GetLockedMessage(rivalId),
+                    2.5f
+                );
+
+                PlayTalkAnimation();
+                return;
+            }
+
+            bool isRematch =
+                ModuleZRivalProgression.IsRivalDefeated(rivalId);
+
+            if (isRematch && !allowRematchWhenDefeated)
+            {
+                ShowMessage(GetDefeatedMessage(), 2f);
+                PlayTalkAnimation();
+                return;
+            }
+
             duelStarting = true;
 
-            ModuleZTalkAnimation talkAnimation = GetComponent<ModuleZTalkAnimation>();
-            if (talkAnimation != null)
-                talkAnimation.PlayTalkAnimation();
+            PlayTalkAnimation();
 
-            string message = GetChallengeMessage();
+            string message = isRematch
+                ? "Rematch contra " + GetRivalDisplayName() + "."
+                : GetChallengeMessage();
 
             Debug.Log("[Module Z] " + message);
+            ShowMessage(message, 1.5f);
 
-            if (OpenWorldMessageHUD.Instance != null)
-                OpenWorldMessageHUD.Instance.ShowDialogue(message, 1.5f);
-
-            ModuleZGameState.CurrentDuelRival = rivalId;
-
-            ModuleZGameState.OpenWorldReturnPosition =
+            ModuleZGameState.PendingDuelRival = rivalId;
+            Vector3 returnPosition =
                 transform.position + new Vector3(0f, 0f, -3f);
 
+            ModuleZDuelSessionState.StartDuel(
+                rivalId,
+                isRematch,
+                returnPosition
+            );
+
+            ModuleZGameState.CurrentDuelRival = rivalId;
+            ModuleZGameState.CurrentDuelIsRematch = isRematch;
+            ModuleZGameState.OpenWorldReturnPosition = returnPosition;
+
             ModuleZGameState.ReturningFromDuel = true;
-            ModuleZGameState.CurrentDuelTheme = GetDuelTheme();
             ModuleZGameState.DuelCompleted = false;
             ModuleZGameState.DuelWasCancelled = false;
+            ModuleZGameState.DuelWasLost = false;
+            ModuleZGameState.DuelWasAbandoned = false;
 
             Invoke(nameof(StartDuel), 1.5f);
+
+            Debug.Log(
+    "[ModuleZ DEBUG] NPC rivalId = " +
+    rivalId
+);
         }
 
-        private string GetChallengeMessage()
+        private string GetRivalDisplayName()
         {
             switch (rivalId)
             {
                 case ModuleZRivalId.Madrid:
-                    return "En Madrid se gana con cabeza. Te reto.";
+                    return "Madrid";
 
                 case ModuleZRivalId.Barcelona:
-                    return "A ver si puedes seguir mi ritmo. Duelo Module Z.";
+                    return "Barcelona";
 
                 case ModuleZRivalId.Valencia:
-                    return "Vamos a resolver este puzzle al sol. Te reto.";
+                    return "Valencia";
+
+                case ModuleZRivalId.Andalucia:
+                    return "Andalucía";
 
                 default:
-                    return "Te reto a un duelo Module Z.";
+                    return "Rival";
             }
         }
 
@@ -76,28 +115,70 @@ namespace ModuleZ.OpenWorld.Encounters
             ModuleZGameState.DuelWasLost = false;
             ModuleZGameState.DuelWasAbandoned = false;
 
-            ModuleZSceneController.Instance.LoadDuel();
+            if (ModuleZSceneController.Instance != null)
+                ModuleZSceneController.Instance.LoadDuel();
+            else
+                Debug.LogError("[Module Z] No existe ModuleZSceneController.");
         }
 
-        private ModuleZDuelThemeId GetDuelTheme()
+        private string GetChallengeMessage()
         {
             switch (rivalId)
             {
                 case ModuleZRivalId.Madrid:
-                    return ModuleZDuelThemeId.Madrid70s;
+                    return "En Madrid se gana con cabeza. Te reto.";
 
                 case ModuleZRivalId.Barcelona:
-                    return ModuleZDuelThemeId.Barcelona70s;
+                    return "Barcelona está lista para el siguiente duelo Module Z.";
 
                 case ModuleZRivalId.Valencia:
-                    return ModuleZDuelThemeId.Valencia70s;
+                    return "Valencia sube la dificultad. Demuéstralo.";
 
                 case ModuleZRivalId.Andalucia:
-                    return ModuleZDuelThemeId.Andalucia70s;
+                    return "Has llegado hasta Andalucía. Este será el gran reto.";
 
                 default:
-                    return ModuleZDuelThemeId.Madrid70s;
+                    return "Te reto a un duelo Module Z.";
             }
+        }
+
+        private string GetDefeatedMessage()
+        {
+            switch (rivalId)
+            {
+                case ModuleZRivalId.Madrid:
+                    return "Ya derrotaste al rival de Madrid.";
+
+                case ModuleZRivalId.Barcelona:
+                    return "Ya derrotaste al rival de Barcelona.";
+
+                case ModuleZRivalId.Valencia:
+                    return "Ya derrotaste al rival de Valencia.";
+
+                case ModuleZRivalId.Andalucia:
+                    return ModuleZGameState.MainProgressionCompleted
+                        ? "Has completado la progresión principal de Module Z."
+                        : "Ya derrotaste al rival de Andalucía.";
+
+                default:
+                    return "Ya has derrotado a este rival.";
+            }
+        }
+
+        private void PlayTalkAnimation()
+        {
+            ModuleZTalkAnimation talkAnimation = GetComponent<ModuleZTalkAnimation>();
+
+            if (talkAnimation != null)
+                talkAnimation.PlayTalkAnimation();
+        }
+
+        private void ShowMessage(string message, float duration)
+        {
+            Debug.Log("[Module Z] " + message);
+
+            if (OpenWorldMessageHUD.Instance != null)
+                OpenWorldMessageHUD.Instance.ShowDialogue(message, duration);
         }
     }
 }

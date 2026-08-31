@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ModuleZ.OpenWorld.Themes.Madrid70s
 {
-    public class Madrid70sGroundBuilder : MonoBehaviour
+    public class Madrid70sOpenWorldGroundBuilder : MonoBehaviour
     {
         public void Build()
         {
@@ -18,7 +18,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
             ground.name = "Ground_Madrid_70s";
             ground.transform.position = new Vector3(0f, -0.1f, 0f);
-            ground.transform.localScale = new Vector3(80f, 0.2f, 80f);
+            ground.transform.localScale = new Vector3(70f, 0.2f, 70f);
 
             Renderer renderer = ground.GetComponent<Renderer>();
             renderer.material.color = new Color(0.42f, 0.36f, 0.30f);
@@ -29,7 +29,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
             GameObject plaza = GameObject.CreatePrimitive(PrimitiveType.Cube);
             plaza.name = "Plaza_Central_Adoquines";
             plaza.transform.position = new Vector3(0f, 0.02f, 0f);
-            plaza.transform.localScale = new Vector3(28f, 0.08f, 28f);
+            plaza.transform.localScale = new Vector3(20f, 0.08f, 20f);
 
             Renderer renderer = plaza.GetComponent<Renderer>();
             renderer.material.color = new Color(0.50f, 0.47f, 0.42f);
@@ -37,9 +37,9 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
 
         private void CreatePlazaTiles()
         {
-            for (int x = -13; x <= 13; x += 2)
+            for (int x = -9; x <= 9; x += 2)
             {
-                for (int z = -13; z <= 13; z += 2)
+                for (int z = -9; z <= 9; z += 2)
                 {
                     GameObject tile = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     tile.name = "Adoquin_Plaza";

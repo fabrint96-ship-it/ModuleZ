@@ -9,28 +9,49 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             CreateWhiteHouses();
             CreateMainPatioBuilding();
             CreateArches();
+            ApplyAndaluciaLighting();
 
             Debug.Log("[Module Z] Edificios OpenWorld Andalucía años 70 creados.");
         }
 
+        private void ApplyAndaluciaLighting()
+        {
+            RenderSettings.ambientLight =
+                new Color(0.55f, 0.50f, 0.42f);
+
+            RenderSettings.fog = true;
+            RenderSettings.fogColor =
+                new Color(0.62f, 0.56f, 0.48f);
+
+            RenderSettings.fogDensity = 0.008f;
+
+            Light[] lights = FindObjectsOfType<Light>();
+
+            for (int i = 0; i < lights.Length; i++)
+            {
+                if (lights[i].type == LightType.Directional)
+                    lights[i].intensity = 0.75f;
+            }
+        }
+
         private void CreateWhiteHouses()
         {
-            CreateBuilding("Andalucia_Casa_Blanca_A", new Vector3(-28f, 3f, 0f), new Vector3(8f, 6f, 24f));
-            CreateBuilding("Andalucia_Casa_Blanca_B", new Vector3(28f, 3f, 0f), new Vector3(8f, 6f, 24f));
-            CreateBuilding("Andalucia_Casa_Blanca_C", new Vector3(0f, 3f, 28f), new Vector3(24f, 6f, 8f));
+            CreateBuilding("Andalucia_Casa_Blanca_A", new Vector3(-16f, 3f, -5f), new Vector3(6f, 6f, 12f));
+            CreateBuilding("Andalucia_Casa_Blanca_B", new Vector3(16f, 3f, 5f), new Vector3(6f, 6f, 12f));
+            CreateBuilding("Andalucia_Casa_Blanca_C", new Vector3(0f, 3f, 16f), new Vector3(16f, 6f, 6f));
         }
 
         private void CreateMainPatioBuilding()
         {
             CreateBuilding(
                 "Andalucia_Patio_Principal",
-                new Vector3(0f, 2.5f, -28f),
-                new Vector3(24f, 5f, 8f)
+                new Vector3(0f, 2.5f, -16f),
+                new Vector3(16f, 5f, 6f)
             );
 
             CreateCube(
                 "Andalucia_Cartel_Patio",
-                new Vector3(0f, 4.7f, -23.9f),
+                new Vector3(0f, 4.7f, -12.9f),
                 new Vector3(8f, 1f, 0.12f),
                 new Color(0.18f, 0.45f, 0.75f)
             );
@@ -77,9 +98,9 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
 
         private void CreateArches()
         {
-            CreateArch(new Vector3(-8f, 1.5f, -23.8f));
-            CreateArch(new Vector3(0f, 1.5f, -23.8f));
-            CreateArch(new Vector3(8f, 1.5f, -23.8f));
+            CreateArch(new Vector3(-5f, 1.25f, -12.8f));
+            CreateArch(new Vector3(0f, 1.25f, -12.8f));
+            CreateArch(new Vector3(5f, 1.25f, -12.8f));
         }
 
         private void CreateArch(Vector3 position)

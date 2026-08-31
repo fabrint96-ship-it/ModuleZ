@@ -32,7 +32,7 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Madrid_Entrada",
                         text = "MADRID 70s",
-                        position = new Vector3(0f, 2.5f, 25.5f),
+                        position = new Vector3(0f, 5.0f, 13.0f),
                         scale = new Vector3(8f, 1.1f, 0.12f),
                         color = new Color(0.95f, 0.75f, 0.20f)
                     },
@@ -40,19 +40,10 @@ namespace ModuleZ.OpenWorld.Builders
                     new CitySignData
                     {
                         name = "Cartel_Madrid_Plaza",
-                        text = "PLAZA CENTRAL",
-                        position = new Vector3(0f, 2.0f, 5f),
+                        text = "PLAZA \nCENTRAL",
+                        position = new Vector3(0f, 3.0f, 0f),
                         scale = new Vector3(5f, 0.8f, 0.12f),
                         color = new Color(0.90f, 0.85f, 0.40f)
-                    },
-
-                    new CitySignData
-                    {
-                        name = "Cartel_Madrid_Duelo",
-                        text = "ARENA DE DUELO",
-                        position = new Vector3(0f, 2.0f, -18f),
-                        scale = new Vector3(6f, 0.8f, 0.12f),
-                        color = new Color(0.90f, 0.35f, 0.25f)
                     }
                 }
             };
@@ -86,7 +77,7 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Barcelona_Entrada",
                         text = "BARCELONA 70s",
-                        position = new Vector3(0f, 2.5f, 25.5f),
+                        position = new Vector3(0f, 5.0f, 13.0f),
                         scale = new Vector3(8f, 1.1f, 0.12f),
                         color = new Color(0.20f, 0.55f, 0.85f)
                     },
@@ -95,18 +86,9 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Barcelona_Plaza",
                         text = "RAMBLA CENTRAL",
-                        position = new Vector3(0f, 2.0f, 5f),
+                        position = new Vector3(0f, 3.0f, 0f),
                         scale = new Vector3(5f, 0.8f, 0.12f),
                         color = new Color(0.35f, 0.65f, 0.95f)
-                    },
-
-                    new CitySignData
-                    {
-                        name = "Cartel_Barcelona_Duelo",
-                        text = "Z DUEL ARENA",
-                        position = new Vector3(0f, 2.0f, -18f),
-                        scale = new Vector3(6f, 0.8f, 0.12f),
-                        color = new Color(0.95f, 0.50f, 0.20f)
                     }
                 }
             };
@@ -144,7 +126,7 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Valencia_Entrada",
                         text = "VALENCIA 70s",
-                        position = new Vector3(0f, 2.6f, 27.5f),
+                        position = new Vector3(0f, 5.0f, 13.0f),
                         scale = new Vector3(8f, 1.1f, 0.12f),
                         color = new Color(0.95f, 0.62f, 0.20f)
                     },
@@ -153,18 +135,9 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Valencia_Plaza",
                         text = "PLAZA DEL SOL",
-                        position = new Vector3(0f, 2.0f, 6f),
+                        position = new Vector3(0f, 3.0f, 0f),
                         scale = new Vector3(5f, 0.8f, 0.12f),
                         color = new Color(1.00f, 0.75f, 0.25f)
-                    },
-
-                    new CitySignData
-                    {
-                        name = "Cartel_Valencia_Duelo",
-                        text = "ARENA Z VALENCIA",
-                        position = new Vector3(0f, 2.0f, -20f),
-                        scale = new Vector3(6f, 0.8f, 0.12f),
-                        color = new Color(0.95f, 0.40f, 0.15f)
                     }
                 }
             };
@@ -204,7 +177,7 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Andalucia_Entrada",
                         text = "ANDALUCIA 70s",
-                        position = new Vector3(0f, 2.6f, -23.5f),
+                        position = new Vector3(0f, 5.0f, 13.0f),
                         scale = new Vector3(8f, 1.1f, 0.12f),
                         color = new Color(0.90f, 0.72f, 0.28f)
                     },
@@ -213,18 +186,9 @@ namespace ModuleZ.OpenWorld.Builders
                     {
                         name = "Cartel_Andalucia_Plaza",
                         text = "PATIO CENTRAL",
-                        position = new Vector3(0f, 2.0f, 8f),
+                        position = new Vector3(0f, 3.0f, 0f),
                         scale = new Vector3(5f, 0.8f, 0.12f),
                         color = new Color(0.95f, 0.82f, 0.35f)
-                    },
-
-                    new CitySignData
-                    {
-                        name = "Cartel_Andalucia_Duelo",
-                        text = "ARENA FINAL",
-                        position = new Vector3(0f, 2.0f, -20f),
-                        scale = new Vector3(6f, 0.8f, 0.12f),
-                        color = new Color(0.90f, 0.25f, 0.15f)
                     }
                 }
             };

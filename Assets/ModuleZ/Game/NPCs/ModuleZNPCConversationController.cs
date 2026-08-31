@@ -108,7 +108,9 @@ namespace ModuleZ.Game.NPCs
             string message =
                 speakerName + ": " + greeting +
                 "\n" +
-                other.speakerName + ": " + myLine;
+                other.speakerName + ": " + myLine +
+                "\n" +
+                speakerName + ": " + otherLine;
 
             Debug.Log("[Module Z Ambient NPC] " + message);
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ModuleZ.OpenWorld.Themes.Madrid70s
 {
-    public class Madrid70sLightingBuilder : MonoBehaviour
+    public class Madrid70sOpenWorldLightingBuilder : MonoBehaviour
     {
         public void Build()
         {

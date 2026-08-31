@@ -1,3 +1,4 @@
+using ModuleZ.OpenWorld.Builders;
 using UnityEngine;
 
 namespace ModuleZ.OpenWorld.Themes.Valencia70s
@@ -10,6 +11,8 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
             gameObject.AddComponent<Valencia70sOpenWorldGroundBuilder>().Build();
             gameObject.AddComponent<Valencia70sOpenWorldBuildingBuilder>().Build();
             gameObject.AddComponent<Valencia70sOpenWorldPropsBuilder>().Build();
+            gameObject.AddComponent<OpenWorldRoadPropsBuilder>().Build();
+            gameObject.AddComponent<OpenWorldBoundaryWallBuilder>().Build();
             gameObject.AddComponent<Valencia70sOpenWorldNPCBuilder>().Build();
 
             Debug.Log("[Module Z] Theme OpenWorld Valencia años 70 construido.");

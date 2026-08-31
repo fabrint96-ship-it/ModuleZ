@@ -46,11 +46,7 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
             AddAmbientConversation(
                 vendedor,
                 "Vicente",
-                new string[]
-                {
-                    "El sol de Valencia ayuda a pensar mejor.",
-                    "No corras con la pieza Z; mira primero el tablero."
-                }
+                ModuleZNPCDialogueLibrary.ValenciaShopkeeper()
             );
 
             GameObject vecino = CreateHumanNPC(
@@ -81,11 +77,7 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
             AddAmbientConversation(
                 vecino,
                 "Pablo",
-                new string[]
-                {
-                    "Las naranjas de esta plaza dan energía.",
-                    "Un buen movimiento vale más que tres rápidos."
-                }
+                ModuleZNPCDialogueLibrary.ValenciaAmbient()
             );
 
             CreateGuideNPC();
@@ -111,6 +103,8 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
 
                 duelStarter.rivalId = ModuleZRivalId.Valencia;
 
+                ModuleZRivalWorldHUDBuilder.Build(rival.transform, ModuleZRivalId.Valencia);
+
                 rival.AddComponent<ModuleZTalkAnimation>();
                 rival.AddComponent<ModuleZNPCFacePlayer>();
             }
@@ -123,11 +117,13 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
                     new Color(0.08f, 0.08f, 0.08f)
                 );
 
-                MessageInteractable message =
-                    defeatedRival.AddComponent<MessageInteractable>();
+                DuelStarterInteractable duelStarter =
+                    defeatedRival.AddComponent<DuelStarterInteractable>();
 
-                message.interactionText = "Pulsa E para hablar";
-                message.message = GetDefeatedMessage(ModuleZRivalId.Valencia);
+                duelStarter.rivalId = ModuleZRivalId.Valencia;
+                duelStarter.allowRematchWhenDefeated = true;
+
+                ModuleZRivalWorldHUDBuilder.Build(defeatedRival.transform, ModuleZRivalId.Valencia);
 
                 defeatedRival.AddComponent<ModuleZTalkAnimation>();
                 defeatedRival.AddComponent<ModuleZNPCFacePlayer>();

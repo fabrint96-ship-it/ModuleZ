@@ -15,5 +15,7 @@ EditorBuildSettings:
     path: Assets/ModuleZ/Scenes/Duel.unity
     guid: 20b051d55e3e4b94483f780e0fa701a7
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: a41884832c578dc4d886ca386d19e76a, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
+    com.unity.localization.settings: {fileID: 11400000, guid: ee3abc8d29a5799418556d9d979d2c36, type: 2}
   m_UseUCBPForAssetBundles: 0

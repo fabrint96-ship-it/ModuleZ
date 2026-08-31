@@ -18,7 +18,7 @@ namespace ModuleZ.OpenWorld.Themes.Barcelona70s
             CreateCube(
                 "Ground_Barcelona_70s",
                 new Vector3(0f, -0.1f, 0f),
-                new Vector3(80f, 0.2f, 80f),
+                new Vector3(70f, 0.2f, 70f),
                 new Color(0.70f, 0.64f, 0.54f)
             );
         }
@@ -28,7 +28,7 @@ namespace ModuleZ.OpenWorld.Themes.Barcelona70s
             CreateCube(
                 "Plaza_Barcelona_Mediterranea",
                 new Vector3(0f, 0.02f, 0f),
-                new Vector3(30f, 0.08f, 30f),
+                new Vector3(20f, 0.08f, 20f),
                 new Color(0.78f, 0.72f, 0.62f)
             );
         }
@@ -38,9 +38,9 @@ namespace ModuleZ.OpenWorld.Themes.Barcelona70s
             Color blue = new Color(0.20f, 0.55f, 0.85f);
             Color cream = new Color(0.86f, 0.80f, 0.68f);
 
-            for (int x = -14; x <= 14; x += 2)
+            for (int x = -9; x <= 9; x += 2)
             {
-                for (int z = -14; z <= 14; z += 2)
+                for (int z = -9; z <= 9; z += 2)
                 {
                     Color color = ((x + z) % 4 == 0) ? blue : cream;
 

@@ -17,14 +17,14 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
         {
             CreateBuilding(
                 "Valencia_Mercado_70s",
-                new Vector3(0f, 3f, 28f),
+                new Vector3(0f, 3f, 16f),
                 new Vector3(18f, 6f, 8f),
                 new Color(0.86f, 0.76f, 0.56f)
             );
 
             CreateCube(
                 "Valencia_Mercado_Cartel",
-                new Vector3(0f, 5.2f, 23.9f),
+                new Vector3(0f, 5.2f, 11.9f),
                 new Vector3(8f, 1f, 0.12f),
                 new Color(0.95f, 0.55f, 0.15f)
             );
@@ -34,14 +34,14 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
         {
             CreateBuilding(
                 "Valencia_Residencial_Izq",
-                new Vector3(-26f, 3f, 0f),
+                new Vector3(-16f, 3f, 0f),
                 new Vector3(8f, 6f, 26f),
                 new Color(0.88f, 0.80f, 0.62f)
             );
 
             CreateBuilding(
                 "Valencia_Residencial_Der",
-                new Vector3(26f, 3f, 0f),
+                new Vector3(16f, 3f, 0f),
                 new Vector3(8f, 6f, 26f),
                 new Color(0.92f, 0.84f, 0.66f)
             );
@@ -51,14 +51,14 @@ namespace ModuleZ.OpenWorld.Themes.Valencia70s
         {
             CreateBuilding(
                 "Valencia_Tienda_Naranja",
-                new Vector3(-10f, 2.5f, -28f),
+                new Vector3(-6f, 2.5f, -16f),
                 new Vector3(10f, 5f, 7f),
                 new Color(0.90f, 0.65f, 0.35f)
             );
 
             CreateBuilding(
                 "Valencia_Tienda_Ceramica",
-                new Vector3(10f, 2.5f, -28f),
+                new Vector3(6f, 2.5f, -16f),
                 new Vector3(10f, 5f, 7f),
                 new Color(0.82f, 0.74f, 0.58f)
             );

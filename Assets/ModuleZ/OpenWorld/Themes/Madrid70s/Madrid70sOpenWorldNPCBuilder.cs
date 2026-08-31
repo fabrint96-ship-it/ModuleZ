@@ -46,11 +46,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
             AddAmbientConversation(
                 vecino,
                 "Miguel",
-                new string[]
-                {
-                    "Hoy la plaza está tranquila.",
-                    "Dicen que hay nuevos rivales cerca."
-                }
+                ModuleZNPCDialogueLibrary.MadridAmbient()
             );
 
             GameObject comerciante = CreateHumanNPC(
@@ -81,11 +77,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
             AddAmbientConversation(
                 comerciante,
                 "Ramón",
-                new string[]
-                {
-                    "Las piezas Z cada vez son más famosas.",
-                    "Un buen duelo empieza observando el tablero."
-                }
+                 ModuleZNPCDialogueLibrary.MadridShopkeeper()
             );
 
             CreateGuideNPC();
@@ -110,6 +102,8 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
                     new Color(0.05f, 0.05f, 0.08f)
                 );
 
+                ModuleZRivalWorldHUDBuilder.Build(rival.transform, ModuleZRivalId.Madrid);
+
                 DuelStarterInteractable duelStarter =
                     rival.AddComponent<DuelStarterInteractable>();
 
@@ -117,6 +111,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
 
                 rival.AddComponent<ModuleZTalkAnimation>();
                 rival.AddComponent<ModuleZNPCFacePlayer>();
+                rival.AddComponent<ModuleZNPCInteractionCollider>();
             }
             else
             {
@@ -127,14 +122,17 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
                     new Color(0.05f, 0.05f, 0.08f)
                 );
 
-                MessageInteractable message =
-                    defeatedRival.AddComponent<MessageInteractable>();
+                ModuleZRivalWorldHUDBuilder.Build(defeatedRival.transform, ModuleZRivalId.Madrid);
 
-                message.interactionText = "Pulsa E para hablar";
-                message.message = GetDefeatedMessage(ModuleZRivalId.Madrid);
+                DuelStarterInteractable duelStarter =
+                    defeatedRival.AddComponent<DuelStarterInteractable>();
+
+                duelStarter.rivalId = ModuleZRivalId.Madrid;
+                duelStarter.allowRematchWhenDefeated = true;
 
                 defeatedRival.AddComponent<ModuleZTalkAnimation>();
                 defeatedRival.AddComponent<ModuleZNPCFacePlayer>();
+                defeatedRival.AddComponent<ModuleZNPCInteractionCollider>();
             }
         }
 
@@ -151,6 +149,8 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
                     new Color(0.05f, 0.05f, 0.05f)
                 );
 
+                ModuleZRivalWorldHUDBuilder.Build(lockedRival.transform,ModuleZRivalId.Andalucia);
+
                 MessageInteractable message =
                     lockedRival.AddComponent<MessageInteractable>();
 
@@ -160,6 +160,7 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
 
                 lockedRival.AddComponent<ModuleZTalkAnimation>();
                 lockedRival.AddComponent<ModuleZNPCFacePlayer>();
+                lockedRival.AddComponent<ModuleZNPCInteractionCollider>();
                 return;
             }
 
@@ -177,8 +178,11 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
 
                 duelStarter.rivalId = ModuleZRivalId.Andalucia;
 
+                ModuleZRivalWorldHUDBuilder.Build(rival.transform, ModuleZRivalId.Andalucia);
+
                 rival.AddComponent<ModuleZTalkAnimation>();
                 rival.AddComponent<ModuleZNPCFacePlayer>();
+                rival.AddComponent<ModuleZNPCInteractionCollider>();
             }
             else
             {
@@ -189,14 +193,17 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
                     new Color(0.10f, 0.08f, 0.05f)
                 );
 
-                MessageInteractable message =
-                    defeatedRival.AddComponent<MessageInteractable>();
+                ModuleZRivalWorldHUDBuilder.Build(defeatedRival.transform, ModuleZRivalId.Andalucia);
 
-                message.interactionText = "Pulsa E para hablar";
-                message.message = GetDefeatedMessage(ModuleZRivalId.Andalucia);
+                DuelStarterInteractable duelStarter =
+                    defeatedRival.AddComponent<DuelStarterInteractable>();
+
+                duelStarter.rivalId = ModuleZRivalId.Andalucia;
+                duelStarter.allowRematchWhenDefeated = true;
 
                 defeatedRival.AddComponent<ModuleZTalkAnimation>();
                 defeatedRival.AddComponent<ModuleZNPCFacePlayer>();
+                defeatedRival.AddComponent<ModuleZNPCInteractionCollider>();
             }
         }
 
@@ -438,10 +445,12 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
 
                 duelStarter.rivalId = rivalId;
 
+                ModuleZRivalWorldHUDBuilder.Build(rival.transform, rivalId);
+
                 rival.AddComponent<ModuleZTalkAnimation>();
                 rival.AddComponent<ModuleZNPCFacePlayer>();
 
-                AddNPCTrigger(rival);
+                rival.AddComponent<ModuleZNPCInteractionCollider>();
             }
             else
             {
@@ -452,25 +461,19 @@ namespace ModuleZ.OpenWorld.Themes.Madrid70s
                     pantsColor
                 );
 
-                MessageInteractable message =
-                    defeatedRival.AddComponent<MessageInteractable>();
+                ModuleZRivalWorldHUDBuilder.Build(defeatedRival.transform, rivalId);
 
-                message.interactionText = "Pulsa E para hablar";
-                message.message = GetDefeatedMessage(rivalId);
+                DuelStarterInteractable duelStarter =
+                    defeatedRival.AddComponent<DuelStarterInteractable>();
+
+                duelStarter.rivalId = rivalId;
+                duelStarter.allowRematchWhenDefeated = true;
 
                 defeatedRival.AddComponent<ModuleZTalkAnimation>();
                 defeatedRival.AddComponent<ModuleZNPCFacePlayer>();
 
-                AddNPCTrigger(defeatedRival);
+                defeatedRival.AddComponent<ModuleZNPCInteractionCollider>();
             }
-        }
-
-        private void AddNPCTrigger(GameObject npc)
-        {
-            BoxCollider collider = npc.AddComponent<BoxCollider>();
-            collider.center = new Vector3(0f, 0.9f, 0f);
-            collider.size = new Vector3(1.2f, 2f, 1.2f);
-            collider.isTrigger = true;
         }
     }
 }

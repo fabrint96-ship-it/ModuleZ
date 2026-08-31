@@ -46,11 +46,7 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             AddAmbientConversation(
                 antonio,
                 "Antonio",
-                new string[]
-                {
-                    "El patio está tranquilo hoy.",
-                    "Aquí los duelos se ganan con calma."
-                }
+                ModuleZNPCDialogueLibrary.AndaluciaAmbient()
             );
 
             GameObject carmen = CreateHumanNPC(
@@ -81,11 +77,7 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             AddAmbientConversation(
                 carmen,
                 "Carmen",
-                new string[]
-                {
-                    "Las flores alegran la plaza.",
-                    "El rival de Andalucía no se vence por casualidad."
-                }
+                 ModuleZNPCDialogueLibrary.AndaluciaAmbient()
             );
 
             CreateGuideNPC();
@@ -111,6 +103,8 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
 
                 duelStarter.rivalId = ModuleZRivalId.Andalucia;
 
+                ModuleZRivalWorldHUDBuilder.Build(rival.transform, ModuleZRivalId.Andalucia);
+
                 rival.AddComponent<ModuleZTalkAnimation>();
                 rival.AddComponent<ModuleZNPCFacePlayer>();
             }
@@ -123,11 +117,13 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
                     new Color(0.10f, 0.08f, 0.05f)
                 );
 
-                MessageInteractable message =
-                    defeatedRival.AddComponent<MessageInteractable>();
+                DuelStarterInteractable duelStarter =
+                    defeatedRival.AddComponent<DuelStarterInteractable>();
 
-                message.interactionText = "Pulsa E para hablar";
-                message.message = GetDefeatedMessage(ModuleZRivalId.Andalucia);
+                duelStarter.rivalId = ModuleZRivalId.Andalucia;
+                duelStarter.allowRematchWhenDefeated = true;
+
+                ModuleZRivalWorldHUDBuilder.Build(defeatedRival.transform, ModuleZRivalId.Andalucia);
 
                 defeatedRival.AddComponent<ModuleZTalkAnimation>();
                 defeatedRival.AddComponent<ModuleZNPCFacePlayer>();

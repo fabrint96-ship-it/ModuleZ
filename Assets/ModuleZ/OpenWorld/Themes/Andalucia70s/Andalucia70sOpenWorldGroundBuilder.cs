@@ -18,7 +18,7 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             CreateCube(
                 "Ground_Andalucia_70s",
                 new Vector3(0f, -0.1f, 0f),
-                new Vector3(90f, 0.2f, 90f),
+                new Vector3(70f, 0.2f, 70f),
                 new Color(0.88f, 0.84f, 0.72f)
             );
         }
@@ -28,7 +28,7 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             CreateCube(
                 "Andalucia_Patio_Central",
                 new Vector3(0f, 0.02f, 0f),
-                new Vector3(34f, 0.08f, 34f),
+                new Vector3(20f, 0.08f, 20f),
                 new Color(0.95f, 0.92f, 0.84f)
             );
         }
@@ -38,9 +38,9 @@ namespace ModuleZ.OpenWorld.Themes.Andalucia70s
             Color blue = new Color(0.18f, 0.45f, 0.75f);
             Color white = new Color(0.96f, 0.95f, 0.90f);
 
-            for (int x = -16; x <= 16; x += 2)
+            for (int x = -9; x <= 9; x += 2)
             {
-                for (int z = -16; z <= 16; z += 2)
+                for (int z = -9; z <= 9; z += 2)
                 {
                     Color tileColor =
                         ((x + z) % 4 == 0)

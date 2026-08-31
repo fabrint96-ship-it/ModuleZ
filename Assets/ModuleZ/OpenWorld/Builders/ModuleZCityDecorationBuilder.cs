@@ -42,6 +42,7 @@ namespace ModuleZ.OpenWorld.Builders
             mesh.text = text;
             mesh.fontSize = 28;
             mesh.characterSize = 0.06f;
+            mesh.fontStyle = FontStyle.Bold;
             mesh.anchor = TextAnchor.MiddleCenter;
             mesh.alignment = TextAlignment.Center;
             mesh.color = Color.black;
