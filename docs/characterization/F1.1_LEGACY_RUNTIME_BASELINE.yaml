@@ -1,0 +1,84 @@
+schema_version: 1
+baseline:
+  id: F1.1-LEGACY-RUNTIME-BASELINE
+  expected_develop_commit: 2e2d5e3baf1adc0990c3da8b0dcc25e33b907db2
+  tested_commit: NOT_TESTED
+  unity_version: 6000.3.13f1
+  tester: NOT_TESTED
+  tested_at_utc: NOT_TESTED
+  starting_scene: Assets/ModuleZ/Scenes/Boot.unity
+  allowed_statuses: [PASS, FAIL, BLOCKED, NOT_TESTED, NOT_APPLICABLE]
+
+console:
+  pre_play:
+    status: NOT_TESTED
+    errors: NOT_TESTED
+    warnings: NOT_TESTED
+    notes: NOT_TESTED
+  final:
+    status: NOT_TESTED
+    errors: NOT_TESTED
+    warnings: NOT_TESTED
+    notes: NOT_TESTED
+
+smoke_steps:
+  - { id: 1,  action: "Open project and wait for compilation", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 2,  action: "Record pre-Play Console", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 3,  action: "Open production Boot scene", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 4,  action: "Clear Console", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 5,  action: "Enter Play Mode", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 6,  action: "Observe Boot/MainMenu hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 7,  action: "Start the normal game flow", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 8,  action: "Observe persistent/DDOL objects", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 9,  action: "Enter OpenWorld", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 10, action: "Record runtime hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 11, action: "Record all active Cameras and owners", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 12, action: "Record all active AudioListeners and owners", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 13, action: "Verify basic player movement", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 14, action: "Verify one reproducible interaction", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 15, action: "Start one Duel through the normal flow", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 16, action: "Record exact Duel bootstrap/runtime hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 17, action: "Record Cameras/AudioListeners in Duel", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 18, action: "Perform at least one legal player action", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 19, action: "Observe at least one AI action", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 20, action: "Finish or abandon through an available normal path", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 21, action: "Return to OpenWorld", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 22, action: "Compare OpenWorld entry #1 vs entry #2", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 23, action: "Observe persistence/object accumulation", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 24, action: "Trigger/observe save behavior", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 25, action: "Return to MainMenu if supported", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 26, action: "Record final Console state", status: NOT_TESTED, evidence: NOT_TESTED }
+
+observations:
+  persistent_roots: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+  cameras:
+    boot_main_menu: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_1: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    duel: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_2: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+  audio_listeners:
+    boot_main_menu: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_1: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    duel: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_2: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+  scene_transitions:
+    boot_to_open_world: { status: NOT_TESTED, notes: NOT_TESTED }
+    open_world_to_duel: { status: NOT_TESTED, notes: NOT_TESTED }
+    duel_to_open_world: { status: NOT_TESTED, notes: NOT_TESTED }
+    open_world_to_main_menu: { status: NOT_TESTED, notes: NOT_TESTED }
+  duel_bootstrap: { status: NOT_TESTED, class: ModuleZ.Duel3D.Runtime.Duel3DDebugBootstrap, runtime_hierarchy: [], notes: NOT_TESTED }
+  duel_state_transfer:
+    rival_identity: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
+    region_context: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
+    is_rematch: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
+    return_position: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
+    progression_result: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
+  save_observations:
+    path: NOT_TESTED
+    load_on_boot: { status: NOT_TESTED, notes: NOT_TESTED }
+    manual_save: { status: NOT_TESTED, notes: NOT_TESTED }
+    duel_result_save: { status: NOT_TESTED, notes: NOT_TESTED }
+    pause_quit_save: { status: NOT_TESTED, notes: NOT_TESTED }
+  anomalies: []
+
+manual_run_notes: NOT_TESTED
