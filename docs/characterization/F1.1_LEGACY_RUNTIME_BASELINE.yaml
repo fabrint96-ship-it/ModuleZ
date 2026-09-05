@@ -12,14 +12,27 @@ baseline:
 console:
   pre_play:
     status: PASS
-    errors: NOT_TESTED
-    warnings: NOT_TESTED
-    notes: "Pre-Play Console observation completed. PASS records completion of the observation, not an empty Console."
+    logs: 0
+    warnings: 0
+    errors: 0
+    notes: "Pre-Play Console observation completed; screenshot counters recorded above."
   final:
     status: PASS
-    errors: NOT_TESTED
-    warnings: "999+ total Console entries were present; the two-AudioListener diagnostic repeated extensively."
+    logs: "999+"
+    warnings: 0
+    errors: 0
     notes: "Final Console observation completed. PASS records completion of the observation, not absence of diagnostics."
+
+compilation:
+  manual_unity_editor:
+    status: PASS
+    notes: "Project Owner opened ModuleZ in Unity 6000.3.13f1, waited for Editor compilation, entered Play Mode, and completed the 26-step smoke."
+  automated_headless_unity:
+    status: BLOCKED
+    notes: "Missing com.unity.editor.headless license entitlement; no automated/headless compile result claimed."
+  automated_editmode:
+    status: BLOCKED
+    notes: "Not executed because of the same headless license entitlement limitation."
 
 smoke_steps:
   - { id: 1,  action: "Open project and wait for compilation", status: PASS, evidence: "Owner-run Unity 6000.3.13f1 validation." }
