@@ -22,15 +22,19 @@ namespace ModuleZ.Duel3D.Runtime
             if (!autoStartDuel3D)
                 return;
 
-            PrepareGameState();
+            bool hasProductionSession =
+                ModuleZDuelSessionState.HasActiveDuel;
 
-            if (destroyLegacyDuelObjects)
+            if (!hasProductionSession)
+                PrepareDebugGameState();
+
+            if (destroyLegacyDuelObjects && !hasProductionSession)
                 CleanupLegacyDuelScene();
 
-            CreateRuntime();
+            CreateProductionBoundary();
         }
 
-        private void PrepareGameState()
+        private void PrepareDebugGameState()
         {
             ModuleZGameState.CurrentDuelRival = debugRival;
 
@@ -68,16 +72,18 @@ namespace ModuleZ.Duel3D.Runtime
             }
         }
 
-        private void CreateRuntime()
+        private void CreateProductionBoundary()
         {
-            GameObject runtime =
-                new GameObject("Duel3D_Runtime");
+            GameObject sceneRootObject =
+                new GameObject("DuelSceneRoot");
 
-            runtime.AddComponent<Duel3DRuntimeBuilder>();
+            DuelBootstrap bootstrap =
+                sceneRootObject.AddComponent<DuelBootstrap>();
 
-            Debug.Log(
-                "[ModuleZ] Duel3D Runtime creado automáticamente."
-            );
+            DuelSceneRoot sceneRoot =
+                sceneRootObject.AddComponent<DuelSceneRoot>();
+
+            sceneRoot.Initialize(bootstrap);
         }
     }
 }
