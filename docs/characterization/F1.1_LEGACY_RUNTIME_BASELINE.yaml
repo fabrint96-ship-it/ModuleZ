@@ -1,72 +1,75 @@
 schema_version: 1
 baseline:
-  id: F1.1-LEGACY-RUNTIME-BASELINE
+  id: BASELINE-RUNTIME-LEGACY-001
   expected_develop_commit: 2e2d5e3baf1adc0990c3da8b0dcc25e33b907db2
-  tested_commit: NOT_TESTED
+  tested_commit: e075b74701544d008967d65ba0f501b7dd232230
   unity_version: 6000.3.13f1
-  tester: NOT_TESTED
-  tested_at_utc: NOT_TESTED
+  tester: Project Owner
+  tested_at_utc: UNKNOWN
   starting_scene: Assets/ModuleZ/Scenes/Boot.unity
   allowed_statuses: [PASS, FAIL, BLOCKED, NOT_TESTED, NOT_APPLICABLE]
 
 console:
   pre_play:
-    status: NOT_TESTED
+    status: PASS
     errors: NOT_TESTED
     warnings: NOT_TESTED
-    notes: NOT_TESTED
+    notes: "Pre-Play Console observation completed. PASS records completion of the observation, not an empty Console."
   final:
-    status: NOT_TESTED
+    status: PASS
     errors: NOT_TESTED
-    warnings: NOT_TESTED
-    notes: NOT_TESTED
+    warnings: "999+ total Console entries were present; the two-AudioListener diagnostic repeated extensively."
+    notes: "Final Console observation completed. PASS records completion of the observation, not absence of diagnostics."
 
 smoke_steps:
-  - { id: 1,  action: "Open project and wait for compilation", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 2,  action: "Record pre-Play Console", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 3,  action: "Open production Boot scene", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 4,  action: "Clear Console", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 5,  action: "Enter Play Mode", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 6,  action: "Observe Boot/MainMenu hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 7,  action: "Start the normal game flow", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 8,  action: "Observe persistent/DDOL objects", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 9,  action: "Enter OpenWorld", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 10, action: "Record runtime hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 11, action: "Record all active Cameras and owners", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 12, action: "Record all active AudioListeners and owners", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 13, action: "Verify basic player movement", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 14, action: "Verify one reproducible interaction", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 15, action: "Start one Duel through the normal flow", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 16, action: "Record exact Duel bootstrap/runtime hierarchy", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 17, action: "Record Cameras/AudioListeners in Duel", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 18, action: "Perform at least one legal player action", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 19, action: "Observe at least one AI action", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 20, action: "Finish or abandon through an available normal path", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 21, action: "Return to OpenWorld", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 22, action: "Compare OpenWorld entry #1 vs entry #2", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 23, action: "Observe persistence/object accumulation", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 24, action: "Trigger/observe save behavior", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 25, action: "Return to MainMenu if supported", status: NOT_TESTED, evidence: NOT_TESTED }
-  - { id: 26, action: "Record final Console state", status: NOT_TESTED, evidence: NOT_TESTED }
+  - { id: 1,  action: "Open project and wait for compilation", status: PASS, evidence: "Owner-run Unity 6000.3.13f1 validation." }
+  - { id: 2,  action: "Record pre-Play Console", status: PASS, evidence: "Pre-Play Console observed." }
+  - { id: 3,  action: "Open production Boot scene", status: PASS, evidence: "Production Boot used as starting scene." }
+  - { id: 4,  action: "Clear Console", status: PASS, evidence: "Console cleared before Play Mode." }
+  - { id: 5,  action: "Enter Play Mode", status: PASS, evidence: "Play Mode entered." }
+  - { id: 6,  action: "Observe Boot/MainMenu hierarchy", status: PASS, evidence: "Boot/MainMenu observed and functional." }
+  - { id: 7,  action: "Continue through the normal game flow", status: PASS, evidence: "Continue reached OpenWorld." }
+  - { id: 8,  action: "Observe persistent/DDOL objects", status: PASS, evidence: "ModuleZ_Runtime, EventSystem, and DelayedActionManager persisted through the cycle without observed duplicate roots." }
+  - { id: 9,  action: "Enter OpenWorld", status: PASS, evidence: "OpenWorld entered through Continue." }
+  - { id: 10, action: "Record OpenWorld runtime hierarchy", status: PASS, evidence: "OpenWorld hierarchy observed." }
+  - { id: 11, action: "Record OpenWorld Camera ownership", status: FAIL, evidence: "Two runtime objects named Main Camera were observed; expected one authoritative gameplay camera." }
+  - { id: 12, action: "Record OpenWorld AudioListener ownership", status: FAIL, evidence: "Two active AudioListeners were observed; Unity repeatedly reported the two-listener diagnostic." }
+  - { id: 13, action: "Verify basic player movement", status: PASS, evidence: "Player movement completed." }
+  - { id: 14, action: "Verify one NPC interaction", status: PASS, evidence: "NPC interaction completed." }
+  - { id: 15, action: "Start one Duel through normal rival interaction", status: PASS, evidence: "Duel entered from the OpenWorld rival through normal gameplay." }
+  - { id: 16, action: "Observe Duel initialization", status: PASS, evidence: "Duel initialized." }
+  - { id: 17, action: "Record Duel runtime composition", status: PASS, evidence: "Runtime hierarchy contained Duel3D_DebugBootstrap and Duel3D_Runtime." }
+  - { id: 18, action: "Perform at least one legal player Duel action", status: PASS, evidence: "Legal player action completed." }
+  - { id: 19, action: "Observe at least one legal AI Duel action", status: PASS, evidence: "Legal AI action observed." }
+  - { id: 20, action: "Abandon Duel through the available normal path", status: PASS, evidence: "Duel abandoned normally." }
+  - { id: 21, action: "Return to OpenWorld", status: PASS, evidence: "Returned to OpenWorld after abandon." }
+  - { id: 22, action: "Observe second OpenWorld entry", status: PASS, evidence: "Second OpenWorld entry completed." }
+  - { id: 23, action: "Observe persistence/object accumulation", status: PASS, evidence: "The same three DDOL roots persisted; no duplicate ModuleZ_Runtime, EventSystem, or DelayedActionManager root was observed." }
+  - { id: 24, action: "Trigger and observe normal save behavior", status: PASS, evidence: "Normal save behavior completed." }
+  - { id: 25, action: "Return to MainMenu", status: PASS, evidence: "Returned to a functional MainMenu." }
+  - { id: 26, action: "Record final Console state", status: PASS, evidence: "Observation completed; Console contained 999+ entries including repeated two-AudioListener diagnostics." }
 
 observations:
-  persistent_roots: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+  persistent_roots:
+    status: PASS
+    entries: [ModuleZ_Runtime, EventSystem, DelayedActionManager]
+    notes: "The same three DDOL roots were observed through Boot -> OpenWorld -> Duel -> OpenWorld. No duplicate root with any of these names was observed."
   cameras:
     boot_main_menu: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
-    open_world_entry_1: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_1: { status: FAIL, entries: ["Main Camera", "Main Camera"], notes: "Two runtime Main Camera objects were observed; expected one authoritative gameplay camera." }
     duel: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
     open_world_entry_2: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
   audio_listeners:
     boot_main_menu: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
-    open_world_entry_1: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
+    open_world_entry_1: { status: FAIL, entries: ["AudioListener", "AudioListener"], notes: "Two active listeners observed. Unity diagnostic: There are 2 audio listeners in the scene. Please ensure there is always exactly one audio listener in the scene. OpenWorld music remained audible." }
     duel: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
     open_world_entry_2: { status: NOT_TESTED, entries: [], notes: NOT_TESTED }
   scene_transitions:
-    boot_to_open_world: { status: NOT_TESTED, notes: NOT_TESTED }
-    open_world_to_duel: { status: NOT_TESTED, notes: NOT_TESTED }
-    duel_to_open_world: { status: NOT_TESTED, notes: NOT_TESTED }
-    open_world_to_main_menu: { status: NOT_TESTED, notes: NOT_TESTED }
-  duel_bootstrap: { status: NOT_TESTED, class: ModuleZ.Duel3D.Runtime.Duel3DDebugBootstrap, runtime_hierarchy: [], notes: NOT_TESTED }
+    boot_to_open_world: { status: PASS, notes: "Continue entered OpenWorld." }
+    open_world_to_duel: { status: PASS, notes: "Normal rival interaction entered Duel." }
+    duel_to_open_world: { status: PASS, notes: "Normal abandon path returned to OpenWorld." }
+    open_world_to_main_menu: { status: PASS, notes: "Returned to a functional MainMenu." }
+  duel_bootstrap: { status: PASS, class: ModuleZ.Duel3D.Runtime.Duel3DDebugBootstrap, runtime_hierarchy: [Duel3D_DebugBootstrap, Duel3D_Runtime], notes: "Production/debug coupling is VERIFIED_RUNTIME; defect confirmed and not fixed." }
   duel_state_transfer:
     rival_identity: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
     region_context: { status: NOT_TESTED, value: NOT_TESTED, notes: NOT_TESTED }
@@ -76,9 +79,27 @@ observations:
   save_observations:
     path: NOT_TESTED
     load_on_boot: { status: NOT_TESTED, notes: NOT_TESTED }
-    manual_save: { status: NOT_TESTED, notes: NOT_TESTED }
+    manual_save: { status: PASS, notes: "Normal save behavior completed during the owner-run flow." }
     duel_result_save: { status: NOT_TESTED, notes: NOT_TESTED }
     pause_quit_save: { status: NOT_TESTED, notes: NOT_TESTED }
-  anomalies: []
+  anomalies:
+    - id: OPENWORLD-CAMERA-OWNERSHIP
+      status: FAIL
+      evidence: "Two Main Camera objects observed at runtime in OpenWorld."
+      disposition: "DEFECT CONFIRMED / NOT FIXED"
+    - id: OPENWORLD-AUDIOLISTENER-OWNERSHIP
+      status: FAIL
+      evidence: "Two active AudioListeners observed; Unity diagnostic repeated extensively and final Console contained 999+ entries."
+      disposition: "DEFECT CONFIRMED / NOT FIXED"
+    - id: DUEL-PRODUCTION-DEBUG-COUPLING
+      status: PASS
+      evidence: "Normal gameplay entry produced Duel3D_DebugBootstrap and Duel3D_Runtime in the runtime hierarchy."
+      disposition: "VERIFIED_RUNTIME / DEFECT CONFIRMED / NOT FIXED"
 
-manual_run_notes: NOT_TESTED
+recovery_status:
+  REC-EP01-001: CHARACTERIZED
+  REC-EP01-002: "VERIFIED_RUNTIME / DEFECT CONFIRMED / NOT FIXED"
+  REC-EP01-003: "VERIFIED_RUNTIME / FAIL / NOT FIXED"
+  REC-EP01-004: "VERIFIED_RUNTIME / FAIL / NOT FIXED"
+
+manual_run_notes: "Owner-run flow: Boot -> MainMenu -> Continue -> OpenWorld -> Player movement -> NPC interaction -> Rival interaction -> Duel -> Player action -> AI action -> Abandon -> OpenWorld -> Save -> MainMenu."
