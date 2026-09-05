@@ -221,8 +221,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1594808625}
   - component: {fileID: 1594808624}
+  - component: {fileID: 1594808626}
   m_Layer: 0
-  m_Name: Duel3D_DebugBootstrap
+  m_Name: DuelSceneRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,12 +238,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1594808623}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b34cdc96a938584e816e44d085e3a90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.Duel3D.Runtime.Duel3DDebugBootstrap
-  autoStartDuel3D: 1
-  debugRival: 0
-  destroyLegacyDuelObjects: 1
+  m_Script: {fileID: 11500000, guid: 5afc01e7285c48288b0d760699b04b45, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.Duel3D.Runtime.DuelSceneRoot
+  bootstrap: {fileID: 1594808626}
+--- !u!114 &1594808626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594808623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b364f59672e2480c89e52673b00289fa, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleZ.Duel3D.Runtime.DuelBootstrap
 --- !u!4 &1594808625
 Transform:
   m_ObjectHideFlags: 0
@@ -252,7 +263,7 @@ Transform:
   m_GameObject: {fileID: 1594808623}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.92547, y: 0, z: 0.55061}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
