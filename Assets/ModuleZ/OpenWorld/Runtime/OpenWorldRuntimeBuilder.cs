@@ -15,10 +15,16 @@ namespace ModuleZ.OpenWorld.Runtime
     public class OpenWorldRuntimeBuilder : MonoBehaviour
     {
         private GameObject player;
+        private OpenWorldSceneRoot sceneRoot;
         private OpenWorldThemeData currentThemeData;
 
         private void Start()
         {
+            sceneRoot = GetComponent<OpenWorldSceneRoot>();
+
+            if (sceneRoot == null)
+                sceneRoot = gameObject.AddComponent<OpenWorldSceneRoot>();
+
             BuildOpenWorld();
         }
 
@@ -45,7 +51,19 @@ namespace ModuleZ.OpenWorld.Runtime
             CreateMusicController();
 
             CreatePlayer();
-            CreateThirdPersonCamera(player.transform);
+
+            Camera gameplayCamera = OpenWorldGameplayCameraBuilder.Create(
+                player.transform,
+                out AudioListener audioListener,
+                out ModuleZThirdPersonCamera cameraController
+            );
+
+            sceneRoot.Initialize(
+                player,
+                gameplayCamera,
+                audioListener,
+                cameraController
+            );
 
             StartCoroutine(ShowPendingOpenWorldMessageWhenReady());
 
@@ -127,27 +145,6 @@ namespace ModuleZ.OpenWorld.Runtime
             player = builder.BuildPlayer(spawnPosition);
 
             Destroy(builderObj);
-        }
-
-        private void CreateThirdPersonCamera(Transform target)
-        {
-            GameObject cameraObj = new GameObject("Main Camera");
-            cameraObj.tag = "MainCamera";
-
-            Camera camera = cameraObj.AddComponent<Camera>();
-            cameraObj.AddComponent<AudioListener>();
-            camera.fieldOfView = 50f;
-            camera.clearFlags = CameraClearFlags.Skybox;
-
-            ModuleZThirdPersonCamera followCamera =
-                cameraObj.AddComponent<ModuleZThirdPersonCamera>();
-
-            followCamera.SetTarget(target);
-
-            cameraObj.transform.position =
-                target.position + target.rotation * new Vector3(0f, 3.2f, -4.5f);
-
-            cameraObj.transform.LookAt(target.position + Vector3.up * 1.6f);
         }
 
         private void CreateHUD()
