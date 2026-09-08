@@ -41,6 +41,7 @@ namespace ModuleZ.Duel3D.Runtime
         private Duel3DAIDebugInfo aiDebugInfo;
         private Duel3DResultVisualController resultVisualController;
         private Duel3DGameFeedbackManager feedbackManager;
+        private Duel3DResultManager resultManager;
 
         private GameObject boardRoot;
         private GameObject cubesRoot;
@@ -182,9 +183,17 @@ namespace ModuleZ.Duel3D.Runtime
 
             matchResolver.OnMatchFinished += HandleMatchFinished;
 
-            if (FindObjectOfType<Duel3DResultManager>() == null)
+            resultManager = FindObjectOfType<Duel3DResultManager>();
+
+            if (resultManager == null)
+                resultManager = gameObject.AddComponent<Duel3DResultManager>();
+
+            if (!resultManager.Initialize(acceptedContext))
             {
-                gameObject.AddComponent<Duel3DResultManager>();
+                Debug.LogError(
+                    "[ModuleZ] Duel3DResultManager rejected DuelContext."
+                );
+                return;
             }
 
             hudController = gameObject.AddComponent<Duel3DHUDController>();
@@ -728,23 +737,33 @@ namespace ModuleZ.Duel3D.Runtime
 
             ShowRivalResultMessage(result);
 
-            if (Duel3DResultManager.Instance == null)
+            if (resultManager == null)
                 return;
+
+            DuelOutcome outcome;
 
             switch (result)
             {
                 case Duel3DMatchResult.PlayerWin:
-                    Duel3DResultManager.Instance.WinDuel();
+                    outcome = DuelOutcome.Victory;
                     break;
 
                 case Duel3DMatchResult.OpponentWin:
-                    Duel3DResultManager.Instance.LoseDuel();
+                    outcome = DuelOutcome.Defeat;
                     break;
 
                 case Duel3DMatchResult.Draw:
-                    Duel3DResultManager.Instance.LoseDuel();
+                    outcome = DuelOutcome.Defeat;
                     break;
+
+                default:
+                    return;
             }
+
+            resultManager.Complete(new DuelResult(
+                outcome,
+                acceptedContext.RivalId
+            ));
         }
 
         private void ShowRivalResultMessage(
@@ -762,7 +781,7 @@ namespace ModuleZ.Duel3D.Runtime
                     message =
                         Duel3DRivalVictoryLibrary
                             .GetPlayerVictoryMessage(
-                                ModuleZGameState.CurrentDuelRival
+                                acceptedContext.RivalId
                             );
                     break;
 
@@ -771,7 +790,7 @@ namespace ModuleZ.Duel3D.Runtime
                     message =
                         Duel3DRivalVictoryLibrary
                             .GetPlayerDefeatMessage(
-                                ModuleZGameState.CurrentDuelRival
+                                acceptedContext.RivalId
                             );
                     break;
 
@@ -780,7 +799,7 @@ namespace ModuleZ.Duel3D.Runtime
                     message =
                         Duel3DRivalVictoryLibrary
                             .GetDrawMessage(
-                                ModuleZGameState.CurrentDuelRival
+                                acceptedContext.RivalId
                             );
                     break;
             }
