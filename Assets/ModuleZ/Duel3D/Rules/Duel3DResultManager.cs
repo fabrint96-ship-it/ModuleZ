@@ -1,6 +1,7 @@
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.SaveSystem;
 using ModuleZ.Core.SceneLoading;
+using ModuleZ.Game.DuelTransition;
 using ModuleZ.OpenWorld.Encounters;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace ModuleZ.Duel3D.Rules
         public static Duel3DResultManager Instance { get; private set; }
 
         private bool resultResolved;
+        private DuelContext acceptedContext;
+        private bool hasAcceptedContext;
 
         private void Awake()
         {
@@ -23,17 +26,87 @@ namespace ModuleZ.Duel3D.Rules
             Instance = this;
         }
 
-        public void WinDuel()
+        public bool Initialize(DuelContext context)
+        {
+            if (hasAcceptedContext)
+                return false;
+
+            acceptedContext = context;
+            hasAcceptedContext = true;
+            return true;
+        }
+
+        public void Complete(DuelResult result)
+        {
+            if (resultResolved)
+                return;
+
+            if (!hasAcceptedContext)
+            {
+                Debug.LogError(
+                    "[ModuleZ] Duel result has no accepted DuelContext."
+                );
+                return;
+            }
+
+            if (!DuelResultBridge.Complete(
+                    acceptedContext,
+                    result,
+                    ApplyCompatibilityResult,
+                    out string failureReason))
+            {
+                Debug.LogError(
+                    "[ModuleZ] Duel result rejected: " + failureReason
+                );
+            }
+        }
+
+        public void AbandonDuel()
+        {
+            if (!hasAcceptedContext)
+            {
+                Debug.LogError(
+                    "[ModuleZ] Duel abandon has no accepted DuelContext."
+                );
+                return;
+            }
+
+            Complete(new DuelResult(
+                DuelOutcome.Abandoned,
+                acceptedContext.RivalId
+            ));
+        }
+
+        private void ApplyCompatibilityResult(
+            DuelContext context,
+            DuelResult result)
         {
             if (resultResolved)
                 return;
 
             resultResolved = true;
 
-            ModuleZRivalId defeatedRival =
-                ModuleZDuelSessionState.HasActiveDuel
-                    ? ModuleZDuelSessionState.RivalId
-                    : ModuleZGameState.CurrentDuelRival;
+            switch (result.Outcome)
+            {
+                case DuelOutcome.Victory:
+                    ApplyVictory(context, result);
+                    break;
+
+                case DuelOutcome.Defeat:
+                    ApplyDefeat(context, result);
+                    break;
+
+                case DuelOutcome.Abandoned:
+                    ApplyAbandon(context, result);
+                    break;
+            }
+        }
+
+        private void ApplyVictory(
+            DuelContext context,
+            DuelResult result)
+        {
+            ModuleZRivalId defeatedRival = result.RivalId;
 
             ModuleZGameState.DuelCompleted = true;
             ModuleZGameState.DuelWasCancelled = false;
@@ -43,7 +116,7 @@ namespace ModuleZ.Duel3D.Rules
 
             string victoryMessage;
 
-            if (ModuleZGameState.CurrentDuelIsRematch)
+            if (context.IsRematch)
             {
                 ModuleZGameState.RematchesWon++;
 
@@ -81,21 +154,15 @@ namespace ModuleZ.Duel3D.Rules
 
             Debug.Log(
                 "[ModuleZ DEBUG] CurrentDuelRival = " +
-                ModuleZGameState.CurrentDuelRival
+                defeatedRival
             );
         }
 
-        public void LoseDuel()
+        private void ApplyDefeat(
+            DuelContext context,
+            DuelResult result)
         {
-            if (resultResolved)
-                return;
-
-            resultResolved = true;
-
-            ModuleZRivalId defeatedRival =
-                ModuleZDuelSessionState.HasActiveDuel
-                    ? ModuleZDuelSessionState.RivalId
-                    : ModuleZGameState.CurrentDuelRival;
+            ModuleZRivalId defeatedRival = result.RivalId;
 
             ModuleZGameState.DuelCompleted = true;
             ModuleZGameState.DuelWasCancelled = false;
@@ -103,12 +170,12 @@ namespace ModuleZ.Duel3D.Rules
             ModuleZGameState.DuelWasAbandoned = false;
             ModuleZGameState.DuelsLost++;
 
-            if (ModuleZGameState.CurrentDuelIsRematch)
+            if (context.IsRematch)
                 ModuleZGameState.RematchesLost++;
 
-            string defeatMessage = ModuleZGameState.CurrentDuelIsRematch
-                ? "Derrota en rematch contra " + GetRivalName(ModuleZGameState.CurrentDuelRival)
-                : "Derrota contra " + GetRivalName(ModuleZGameState.CurrentDuelRival);
+            string defeatMessage = context.IsRematch
+                ? "Derrota en rematch contra " + GetRivalName(defeatedRival)
+                : "Derrota contra " + GetRivalName(defeatedRival);
 
             ModuleZGameState.LastDuelResultMessage = defeatMessage;
             ModuleZGameState.PendingOpenWorldMessage = defeatMessage;
@@ -124,17 +191,11 @@ namespace ModuleZ.Duel3D.Rules
             Invoke(nameof(ReturnToOpenWorld), 1.5f);
         }
 
-        public void AbandonDuel()
+        private void ApplyAbandon(
+            DuelContext context,
+            DuelResult result)
         {
-            if (resultResolved)
-                return;
-
-            resultResolved = true;
-
-            ModuleZRivalId defeatedRival =
-                ModuleZDuelSessionState.HasActiveDuel
-                    ? ModuleZDuelSessionState.RivalId
-                    : ModuleZGameState.CurrentDuelRival;
+            ModuleZRivalId defeatedRival = result.RivalId;
 
             ModuleZGameState.DuelCompleted = true;
             ModuleZGameState.DuelWasCancelled = false;
@@ -142,12 +203,12 @@ namespace ModuleZ.Duel3D.Rules
             ModuleZGameState.DuelWasAbandoned = true;
             ModuleZGameState.DuelsAbandoned++;
 
-            if (ModuleZGameState.CurrentDuelIsRematch)
+            if (context.IsRematch)
                 ModuleZGameState.RematchesAbandoned++;
 
-            string abandonMessage = ModuleZGameState.CurrentDuelIsRematch
-                ? "Rematch abandonado contra " + GetRivalName(ModuleZGameState.CurrentDuelRival)
-                : "Duelo abandonado contra " + GetRivalName(ModuleZGameState.CurrentDuelRival);
+            string abandonMessage = context.IsRematch
+                ? "Rematch abandonado contra " + GetRivalName(defeatedRival)
+                : "Duelo abandonado contra " + GetRivalName(defeatedRival);
 
             ModuleZGameState.LastDuelResultMessage = abandonMessage;
             ModuleZGameState.PendingOpenWorldMessage = abandonMessage;
