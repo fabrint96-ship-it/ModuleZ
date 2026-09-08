@@ -1,5 +1,6 @@
 using System;
 using ModuleZ.Core.Managers;
+using ModuleZ.Game.DuelTransition;
 using ModuleZ.OpenWorld.Encounters;
 using UnityEngine;
 
@@ -26,7 +27,9 @@ namespace ModuleZ.Duel3D.Runtime
                 return false;
             }
 
-            if (!HasValidLegacyStartupState(out failureReason))
+            if (!TryResolveAcceptedContext(
+                    out DuelContext acceptedContext,
+                    out failureReason))
                 return false;
 
             try
@@ -35,6 +38,16 @@ namespace ModuleZ.Duel3D.Runtime
                 runtimeObject.transform.SetParent(runtimeOwner, false);
                 runtimeBuilder =
                     runtimeObject.AddComponent<Duel3DRuntimeBuilder>();
+
+                if (!runtimeBuilder.Initialize(acceptedContext))
+                {
+                    failureReason =
+                        "Duel3D runtime rejected the accepted DuelContext.";
+                    Destroy(runtimeObject);
+                    runtimeObject = null;
+                    runtimeBuilder = null;
+                    return false;
+                }
 
                 Debug.Log(
                     "[ModuleZ] Production Duel3D runtime created."
@@ -55,19 +68,36 @@ namespace ModuleZ.Duel3D.Runtime
             }
         }
 
-        private static bool HasValidLegacyStartupState(
+        private static bool TryResolveAcceptedContext(
+            out DuelContext acceptedContext,
             out string failureReason)
         {
-            // Transitional F1.2 input boundary. Normal production entry uses
-            // ModuleZDuelSessionState; the legacy pending-rival fallback keeps
-            // direct scene/debug entry compatible until DuelContext migration.
-            ModuleZRivalId rivalId = ModuleZDuelSessionState.HasActiveDuel
-                ? ModuleZDuelSessionState.RivalId
-                : ModuleZGameState.PendingDuelRival;
+            if (ModuleZDuelSessionState.HasActiveDuel)
+            {
+                acceptedContext = new DuelContext(
+                    ModuleZDuelSessionState.RivalId,
+                    ModuleZDuelSessionState.IsRematch,
+                    ModuleZDuelSessionState.ReturnPosition
+                );
+            }
+            else
+            {
+                // Transitional direct-scene fallback. The normal production
+                // path always arrives through an active session projected by
+                // DuelTransitionBridge.
+                acceptedContext = new DuelContext(
+                    ModuleZGameState.PendingDuelRival,
+                    ModuleZGameState.CurrentDuelIsRematch,
+                    ModuleZGameState.OpenWorldReturnPosition
+                );
+            }
 
-            if (!Enum.IsDefined(typeof(ModuleZRivalId), rivalId))
+            if (!Enum.IsDefined(
+                    typeof(ModuleZRivalId),
+                    acceptedContext.RivalId))
             {
                 failureReason = "Legacy Duel rival state is invalid.";
+                acceptedContext = default;
                 return false;
             }
 

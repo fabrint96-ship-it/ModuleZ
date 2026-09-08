@@ -9,6 +9,7 @@ using ModuleZ.Duel3D.Pieces;
 using ModuleZ.Duel3D.Rules;
 using ModuleZ.Duel3D.UI;
 using ModuleZ.Duel3D.Visuals;
+using ModuleZ.Game.DuelTransition;
 using ModuleZ.OpenWorld.Encounters;
 using ModuleZ.Duel3D.Audio;
 using UnityEngine;
@@ -67,6 +68,8 @@ namespace ModuleZ.Duel3D.Runtime
         private Duel3DAISettings runtimeAISettings;
 
         private Duel3DRivalProfile rivalProfile;
+        private DuelContext acceptedContext;
+        private bool hasAcceptedContext;
 
         private float nextRivalAmbientCommentTime;
         private const float RivalAmbientCommentMinInterval = 12f;
@@ -79,7 +82,25 @@ namespace ModuleZ.Duel3D.Runtime
 
         private void Start()
         {
+            if (!hasAcceptedContext)
+            {
+                Debug.LogError(
+                    "[ModuleZ] Duel3DRuntimeBuilder requires DuelContext."
+                );
+                return;
+            }
+
             BuildDuel3D();
+        }
+
+        public bool Initialize(DuelContext context)
+        {
+            if (hasAcceptedContext)
+                return false;
+
+            acceptedContext = context;
+            hasAcceptedContext = true;
+            return true;
         }
 
         private void Update()
@@ -106,19 +127,10 @@ namespace ModuleZ.Duel3D.Runtime
 
         private void BuildDuel3D()
         {
-            if (ModuleZDuelSessionState.HasActiveDuel)
-            {
-                ModuleZGameState.CurrentDuelRival =
-                    ModuleZDuelSessionState.RivalId;
-
-                ModuleZGameState.CurrentDuelIsRematch =
-                    ModuleZDuelSessionState.IsRematch;
-
-                ModuleZGameState.OpenWorldReturnPosition =
-                    ModuleZDuelSessionState.ReturnPosition;
-            }
-
-            ModuleZGameState.CurrentDuelRival = ModuleZGameState.PendingDuelRival;
+            ModuleZGameState.CurrentDuelRival = acceptedContext.RivalId;
+            ModuleZGameState.CurrentDuelIsRematch = acceptedContext.IsRematch;
+            ModuleZGameState.OpenWorldReturnPosition =
+                acceptedContext.ReturnPosition;
 
             if (matchConfig == null)
                 matchConfig = Duel3DMatchConfigProvider.CreateConfigForCurrentDuel();
