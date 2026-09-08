@@ -1,6 +1,6 @@
 using ModuleZ.Core.Managers;
-using ModuleZ.Core.SceneLoading;
 using ModuleZ.Game.Animation;
+using ModuleZ.Game.DuelTransition;
 using ModuleZ.Game.Interaction;
 using ModuleZ.UI.HUD;
 using UnityEngine;
@@ -15,6 +15,8 @@ namespace ModuleZ.OpenWorld.Encounters
         public ModuleZRivalId rivalId = ModuleZRivalId.Madrid;
 
         private bool duelStarting;
+        private DuelContext pendingDuelContext;
+        private bool hasPendingDuelContext;
 
         private void Awake()
         {
@@ -58,25 +60,28 @@ namespace ModuleZ.OpenWorld.Encounters
             Debug.Log("[Module Z] " + message);
             ShowMessage(message, 1.5f);
 
-            ModuleZGameState.PendingDuelRival = rivalId;
             Vector3 returnPosition =
                 transform.position + new Vector3(0f, 0f, -3f);
 
-            ModuleZDuelSessionState.StartDuel(
+            pendingDuelContext = new DuelContext(
                 rivalId,
                 isRematch,
                 returnPosition
             );
 
-            ModuleZGameState.CurrentDuelRival = rivalId;
-            ModuleZGameState.CurrentDuelIsRematch = isRematch;
-            ModuleZGameState.OpenWorldReturnPosition = returnPosition;
+            if (!DuelTransitionBridge.Begin(
+                    pendingDuelContext,
+                    out string failureReason))
+            {
+                duelStarting = false;
+                Debug.LogError(
+                    "[ModuleZ] No se pudo iniciar el duelo: " +
+                    failureReason
+                );
+                return;
+            }
 
-            ModuleZGameState.ReturningFromDuel = true;
-            ModuleZGameState.DuelCompleted = false;
-            ModuleZGameState.DuelWasCancelled = false;
-            ModuleZGameState.DuelWasLost = false;
-            ModuleZGameState.DuelWasAbandoned = false;
+            hasPendingDuelContext = true;
 
             Invoke(nameof(StartDuel), 1.5f);
 
@@ -109,16 +114,13 @@ namespace ModuleZ.OpenWorld.Encounters
 
         private void StartDuel()
         {
-            ModuleZGameState.IsPaused = false;
-            ModuleZGameState.DuelCompleted = false;
-            ModuleZGameState.DuelWasCancelled = false;
-            ModuleZGameState.DuelWasLost = false;
-            ModuleZGameState.DuelWasAbandoned = false;
+            if (!hasPendingDuelContext)
+            {
+                Debug.LogError("[ModuleZ] No existe DuelContext pendiente.");
+                return;
+            }
 
-            if (ModuleZSceneController.Instance != null)
-                ModuleZSceneController.Instance.LoadDuel();
-            else
-                Debug.LogError("[Module Z] No existe ModuleZSceneController.");
+            DuelTransitionBridge.CompleteAfterDelay(pendingDuelContext);
         }
 
         private string GetChallengeMessage()
