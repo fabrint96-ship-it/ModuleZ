@@ -1,0 +1,6 @@
+{
+    "name": "ModuleZ.PlayModeTests",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
