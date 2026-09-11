@@ -7,6 +7,7 @@ using ModuleZ.OpenWorld.Themes.Madrid70s;
 using ModuleZ.OpenWorld.Themes.Valencia70s;
 using ModuleZ.UI.HUD;
 using ModuleZ.UI.PauseMenu;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -15,59 +16,113 @@ namespace ModuleZ.OpenWorld.Runtime
     public class OpenWorldRuntimeBuilder : MonoBehaviour
     {
         private GameObject player;
-        private OpenWorldSceneRoot sceneRoot;
+        private Camera gameplayCamera;
+        private GameObject playerBuilderHost;
         private OpenWorldThemeData currentThemeData;
+        private bool buildAttempted;
 
-        private void Start()
+        public bool TryBuild(
+            out GameObject builtPlayer,
+            out Camera builtGameplayCamera,
+            out AudioListener builtGameplayAudioListener,
+            out ModuleZThirdPersonCamera builtCameraController,
+            out string failureReason)
         {
-            sceneRoot = GetComponent<OpenWorldSceneRoot>();
+            builtPlayer = null;
+            builtGameplayCamera = null;
+            builtGameplayAudioListener = null;
+            builtCameraController = null;
+            failureReason = null;
 
-            if (sceneRoot == null)
-                sceneRoot = gameObject.AddComponent<OpenWorldSceneRoot>();
+            if (buildAttempted)
+            {
+                failureReason = "OpenWorld composition has already been attempted.";
+                return false;
+            }
 
-            BuildOpenWorld();
+            buildAttempted = true;
+            string stage = "theme data resolution";
+
+            try
+            {
+                currentThemeData = OpenWorldThemeDatabase.GetThemeData(
+                    ModuleZ.Core.Managers.ModuleZGameState.CurrentOpenWorldTheme
+                );
+
+                if (currentThemeData == null)
+                    throw new InvalidOperationException("Theme data was not found.");
+
+                stage = "HUD composition";
+                CreateHUDCoordinator();
+                CreateHUD();
+                CreateProgressHUD();
+                CreateAchievementsHUD();
+                CreateStatsHUD();
+                CreateAchievementToastHUD();
+                CreateZoneHUD();
+                CreateSystemMessageHUD();
+
+                stage = "pause composition";
+                CreatePauseMenu();
+
+                stage = "theme composition";
+                BuildTheme();
+
+                stage = "music composition";
+                CreateMusicController();
+
+                stage = "player composition";
+                player = CreatePlayer();
+
+                if (player == null)
+                    throw new InvalidOperationException("Player creation returned null.");
+
+                stage = "gameplay camera composition";
+                gameplayCamera = OpenWorldGameplayCameraBuilder.Create(
+                    player.transform,
+                    out AudioListener audioListener,
+                    out ModuleZThirdPersonCamera cameraController
+                );
+
+                builtPlayer = player;
+                builtGameplayCamera = gameplayCamera;
+                builtGameplayAudioListener = audioListener;
+                builtCameraController = cameraController;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                CleanUpFailedBuild();
+                failureReason = stage + " failed: " + exception.Message;
+                return false;
+            }
         }
 
-        private void BuildOpenWorld()
+        internal void BeginPostBuild()
         {
-            currentThemeData = OpenWorldThemeDatabase.GetThemeData(
-                ModuleZ.Core.Managers.ModuleZGameState.CurrentOpenWorldTheme
-            );
-
-            CreateHUDCoordinator();
-
-            CreateHUD();
-            CreateProgressHUD();
-            CreateAchievementsHUD();
-            CreateStatsHUD();
-            CreateAchievementToastHUD();
-            CreateZoneHUD();
-            CreateSystemMessageHUD();
-
-            CreatePauseMenu();
-
-            BuildTheme();
-
-            CreateMusicController();
-
-            CreatePlayer();
-
-            Camera gameplayCamera = OpenWorldGameplayCameraBuilder.Create(
-                player.transform,
-                out AudioListener audioListener,
-                out ModuleZThirdPersonCamera cameraController
-            );
-
-            sceneRoot.Initialize(
-                player,
-                gameplayCamera,
-                audioListener,
-                cameraController
-            );
-
             StartCoroutine(ShowPendingOpenWorldMessageWhenReady());
+        }
 
-            Debug.Log("[Module Z] OpenWorld generado: " + currentThemeData.themeName);
+        internal void CleanUpFailedBuild()
+        {
+            DestroyOwnedObject(gameplayCamera != null
+                ? gameplayCamera.gameObject
+                : null);
+            DestroyOwnedObject(player);
+            DestroyOwnedObject(playerBuilderHost);
+
+            gameplayCamera = null;
+            player = null;
+            playerBuilderHost = null;
+        }
+
+        private static void DestroyOwnedObject(GameObject ownedObject)
+        {
+            if (ownedObject == null)
+                return;
+
+            ownedObject.SetActive(false);
+            Destroy(ownedObject);
         }
 
         private IEnumerator ShowPendingOpenWorldMessageWhenReady()
@@ -133,18 +188,26 @@ namespace ModuleZ.OpenWorld.Runtime
             }
         }
 
-        private void CreatePlayer()
+        private GameObject CreatePlayer()
         {
-            GameObject builderObj = new GameObject("PlayerBuilder");
-            ModuleZPlayerBuilder builder = builderObj.AddComponent<ModuleZPlayerBuilder>();
+            playerBuilderHost = new GameObject("PlayerBuilder");
 
-            Vector3 spawnPosition = ModuleZ.Core.Managers.ModuleZGameState.ReturningFromDuel
-                ? ModuleZ.Core.Managers.ModuleZGameState.OpenWorldReturnPosition
-                : new Vector3(0f, 0.1f, -4f);
+            try
+            {
+                ModuleZPlayerBuilder builder =
+                    playerBuilderHost.AddComponent<ModuleZPlayerBuilder>();
 
-            player = builder.BuildPlayer(spawnPosition);
+                Vector3 spawnPosition = ModuleZ.Core.Managers.ModuleZGameState.ReturningFromDuel
+                    ? ModuleZ.Core.Managers.ModuleZGameState.OpenWorldReturnPosition
+                    : new Vector3(0f, 0.1f, -4f);
 
-            Destroy(builderObj);
+                return builder.BuildPlayer(spawnPosition);
+            }
+            finally
+            {
+                DestroyOwnedObject(playerBuilderHost);
+                playerBuilderHost = null;
+            }
         }
 
         private void CreateHUD()

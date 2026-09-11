@@ -4,6 +4,7 @@ using UnityEngine;
 namespace ModuleZ.OpenWorld.Runtime
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(OpenWorldRuntimeBuilder))]
     public sealed class OpenWorldSceneRoot : MonoBehaviour
     {
         public enum LifecycleState
@@ -22,11 +23,12 @@ namespace ModuleZ.OpenWorld.Runtime
         public AudioListener GameplayAudioListener { get; private set; }
         public ModuleZThirdPersonCamera CameraController { get; private set; }
 
-        public bool Initialize(
-            GameObject player,
-            Camera gameplayCamera,
-            AudioListener gameplayAudioListener,
-            ModuleZThirdPersonCamera cameraController)
+        private void Start()
+        {
+            Initialize();
+        }
+
+        public bool Initialize()
         {
             if (State == LifecycleState.Ready)
                 return true;
@@ -36,16 +38,39 @@ namespace ModuleZ.OpenWorld.Runtime
 
             State = LifecycleState.Initializing;
 
+            OpenWorldRuntimeBuilder runtimeBuilder =
+                GetComponent<OpenWorldRuntimeBuilder>();
+
+            if (runtimeBuilder == null)
+                return Fail("OpenWorldRuntimeBuilder is required.");
+
+            if (!runtimeBuilder.TryBuild(
+                    out GameObject player,
+                    out Camera gameplayCamera,
+                    out AudioListener gameplayAudioListener,
+                    out ModuleZThirdPersonCamera cameraController,
+                    out string failureReason))
+            {
+                return Fail(failureReason);
+            }
+
             if (player == null)
-                return Fail("Player ownership is required.");
+                return FailAndCleanUp(
+                    runtimeBuilder,
+                    "Player ownership is required."
+                );
 
             if (gameplayCamera == null)
-                return Fail("Gameplay Camera ownership is required.");
+                return FailAndCleanUp(
+                    runtimeBuilder,
+                    "Gameplay Camera ownership is required."
+                );
 
             if (gameplayAudioListener == null ||
                 gameplayAudioListener.gameObject != gameplayCamera.gameObject)
             {
-                return Fail(
+                return FailAndCleanUp(
+                    runtimeBuilder,
                     "The gameplay AudioListener must belong to the gameplay Camera."
                 );
             }
@@ -53,7 +78,8 @@ namespace ModuleZ.OpenWorld.Runtime
             if (cameraController == null ||
                 cameraController.gameObject != gameplayCamera.gameObject)
             {
-                return Fail(
+                return FailAndCleanUp(
+                    runtimeBuilder,
                     "The third-person controller must belong to the gameplay Camera."
                 );
             }
@@ -65,7 +91,16 @@ namespace ModuleZ.OpenWorld.Runtime
             State = LifecycleState.Ready;
 
             Debug.Log("[ModuleZ] OpenWorldSceneRoot ready.");
+            runtimeBuilder.BeginPostBuild();
             return true;
+        }
+
+        private bool FailAndCleanUp(
+            OpenWorldRuntimeBuilder runtimeBuilder,
+            string failureReason)
+        {
+            runtimeBuilder.CleanUpFailedBuild();
+            return Fail(failureReason);
         }
 
         private bool Fail(string failureReason)
