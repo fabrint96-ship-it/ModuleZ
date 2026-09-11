@@ -60,12 +60,27 @@ namespace ModuleZ.Duel3D.Runtime
                 return Fail(failureReason);
             }
 
+            if (!runtimeBuilder.TryBuild(out failureReason))
+            {
+                CleanUpFailedRuntime(runtimeObject);
+                return Fail(failureReason);
+            }
+
             RuntimeObject = runtimeObject;
             RuntimeBuilder = runtimeBuilder;
             State = LifecycleState.Ready;
 
             Debug.Log("[ModuleZ] DuelSceneRoot ready.");
             return true;
+        }
+
+        private static void CleanUpFailedRuntime(GameObject runtimeObject)
+        {
+            if (runtimeObject == null)
+                return;
+
+            runtimeObject.SetActive(false);
+            Destroy(runtimeObject);
         }
 
         private bool Fail(string failureReason)

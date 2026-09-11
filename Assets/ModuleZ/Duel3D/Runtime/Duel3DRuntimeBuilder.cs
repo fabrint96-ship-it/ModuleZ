@@ -71,6 +71,8 @@ namespace ModuleZ.Duel3D.Runtime
         private Duel3DRivalProfile rivalProfile;
         private DuelContext acceptedContext;
         private bool hasAcceptedContext;
+        private bool buildAttempted;
+        private bool buildCompleted;
 
         private float nextRivalAmbientCommentTime;
         private const float RivalAmbientCommentMinInterval = 12f;
@@ -81,17 +83,32 @@ namespace ModuleZ.Duel3D.Runtime
         private int previousPlayerCubeCount;
         private int previousOpponentCubeCount;
 
-        private void Start()
+        public bool TryBuild(out string failureReason)
         {
+            failureReason = null;
+
             if (!hasAcceptedContext)
             {
-                Debug.LogError(
-                    "[ModuleZ] Duel3DRuntimeBuilder requires DuelContext."
-                );
-                return;
+                failureReason = "Duel3DRuntimeBuilder requires DuelContext.";
+                return false;
             }
 
-            BuildDuel3D();
+            if (buildCompleted)
+                return true;
+
+            if (buildAttempted)
+            {
+                failureReason = "Duel3D runtime composition was already attempted.";
+                return false;
+            }
+
+            buildAttempted = true;
+
+            if (!TryBuildDuel3D(out failureReason))
+                return false;
+
+            buildCompleted = true;
+            return true;
         }
 
         public bool Initialize(DuelContext context)
@@ -126,108 +143,146 @@ namespace ModuleZ.Duel3D.Runtime
             UpdateAIDebug();
         }
 
-        private void BuildDuel3D()
+        private bool TryBuildDuel3D(out string failureReason)
         {
-            ModuleZGameState.CurrentDuelRival = acceptedContext.RivalId;
-            ModuleZGameState.CurrentDuelIsRematch = acceptedContext.IsRematch;
-            ModuleZGameState.OpenWorldReturnPosition =
-                acceptedContext.ReturnPosition;
+            failureReason = null;
+            string stage = "legacy context projection";
 
-            if (matchConfig == null)
-                matchConfig = Duel3DMatchConfigProvider.CreateConfigForCurrentDuel();
+            try
+            {
+                ModuleZGameState.CurrentDuelRival = acceptedContext.RivalId;
+                ModuleZGameState.CurrentDuelIsRematch = acceptedContext.IsRematch;
+                ModuleZGameState.OpenWorldReturnPosition =
+                    acceptedContext.ReturnPosition;
 
-            ApplyConfigValues();
+                stage = "match configuration";
+                if (matchConfig == null)
+                    matchConfig = Duel3DMatchConfigProvider.CreateConfigForCurrentDuel();
 
-            rivalProfile =
-                Duel3DRivalProfileLibrary.Get(
-                    ModuleZGameState.CurrentDuelRival
+                if (matchConfig == null)
+                    throw new System.InvalidOperationException("Match configuration was not found.");
+
+                ApplyConfigValues();
+
+                stage = "rival profile resolution";
+                rivalProfile =
+                    Duel3DRivalProfileLibrary.Get(
+                        ModuleZGameState.CurrentDuelRival
+                    );
+
+                stage = "camera composition";
+                Duel3DCameraBuilder cameraBuilder = gameObject.AddComponent<Duel3DCameraBuilder>();
+                Camera duelCamera = cameraBuilder.BuildCamera();
+
+                if (duelCamera == null)
+                    throw new System.InvalidOperationException("Duel camera creation returned null.");
+
+                if (matchConfig.useOrbitCamera)
+                {
+                    Duel3DOrbitCameraController orbitCamera =
+                        gameObject.AddComponent<Duel3DOrbitCameraController>();
+
+                    orbitCamera.Initialize(duelCamera, Vector3.zero);
+                }
+
+                stage = "arena composition";
+                CreateCityArena();
+
+                stage = "music composition";
+                Duel3DMusicController musicController =
+                    gameObject.AddComponent<Duel3DMusicController>();
+
+                musicController.PlayCurrentDuelMusic();
+
+                stage = "board composition";
+                CreateMaterials();
+
+                board = new Duel3DBoardGrid(width, height, depth);
+
+                boardRoot = new GameObject("Duel3D_BoardRoot");
+                cubesRoot = new GameObject("Duel3D_CubesRoot");
+                previewRoot = new GameObject("Duel3D_PreviewRoot");
+                forbiddenRoot = new GameObject("Duel3D_ForbiddenRoot");
+
+                boardRoot.transform.SetParent(transform, true);
+                cubesRoot.transform.SetParent(transform, true);
+                previewRoot.transform.SetParent(transform, true);
+                forbiddenRoot.transform.SetParent(transform, true);
+
+                BuildBoardFrame();
+
+                stage = "AI composition";
+                runtimeAISettings = GetRuntimeAISettings();
+                aiController = new Duel3DAIController(runtimeAISettings, rivalProfile);
+
+                stage = "match resolver composition";
+                matchResolver = gameObject.AddComponent<Duel3DMatchResolver>();
+                matchResolver.Initialize(board);
+
+                previousPlayerCubeCount = matchResolver.GetPlayerCubeCount();
+                previousOpponentCubeCount = matchResolver.GetOpponentCubeCount();
+
+                matchResolver.OnMatchFinished += HandleMatchFinished;
+
+                stage = "result manager composition";
+                resultManager = FindObjectOfType<Duel3DResultManager>();
+
+                if (resultManager == null)
+                    resultManager = gameObject.AddComponent<Duel3DResultManager>();
+
+                if (!resultManager.Initialize(acceptedContext))
+                {
+                    failureReason =
+                        "result manager composition failed: Duel3DResultManager rejected DuelContext.";
+                    return false;
+                }
+
+                stage = "HUD composition";
+                hudController = gameObject.AddComponent<Duel3DHUDController>();
+                hudController.BuildHUD();
+
+                ShowRivalIntroduction();
+                MarkCurrentRivalPersonalityCompleted();
+
+                stage = "pause and feedback composition";
+                gameObject.AddComponent<ModuleZ.UI.PauseMenu.DuelPauseMenuController>();
+
+                resultVisualController =
+                    gameObject.AddComponent<Duel3DResultVisualController>();
+
+                feedbackManager =
+                    gameObject.AddComponent<Duel3DGameFeedbackManager>();
+
+                feedbackManager.Initialize(
+                    hudController,
+                    resultVisualController
                 );
 
-            Duel3DCameraBuilder cameraBuilder = gameObject.AddComponent<Duel3DCameraBuilder>();
-            Camera duelCamera = cameraBuilder.BuildCamera();
+                // Oculta HUD IA
+                if (false)
+                {
+                    aiDebugInfo = gameObject.AddComponent<Duel3DAIDebugInfo>();
+                    aiDebugInfo.Build();
+                }
 
-            if (matchConfig.useOrbitCamera)
-            {
-                Duel3DOrbitCameraController orbitCamera =
-                    gameObject.AddComponent<Duel3DOrbitCameraController>();
+                stage = "runtime finalization";
+                RefreshPreview();
+                UpdateHUD();
+                ScheduleNextRivalAmbientComment();
 
-                orbitCamera.Initialize(duelCamera, Vector3.zero);
+                return true;
             }
-
-            CreateCityArena();
-
-            Duel3DMusicController musicController =
-                gameObject.AddComponent<Duel3DMusicController>();
-
-            musicController.PlayCurrentDuelMusic();
-
-            CreateMaterials();
-
-            board = new Duel3DBoardGrid(width, height, depth);
-
-            boardRoot = new GameObject("Duel3D_BoardRoot");
-            cubesRoot = new GameObject("Duel3D_CubesRoot");
-            previewRoot = new GameObject("Duel3D_PreviewRoot");
-            forbiddenRoot = new GameObject("Duel3D_ForbiddenRoot");
-
-            BuildBoardFrame();
-
-            runtimeAISettings = GetRuntimeAISettings();
-            aiController = new Duel3DAIController(runtimeAISettings, rivalProfile);
-
-            matchResolver = gameObject.AddComponent<Duel3DMatchResolver>();
-            matchResolver.Initialize(board);
-
-            previousPlayerCubeCount = matchResolver.GetPlayerCubeCount();
-            previousOpponentCubeCount = matchResolver.GetOpponentCubeCount();
-
-            matchResolver.OnMatchFinished += HandleMatchFinished;
-
-            resultManager = FindObjectOfType<Duel3DResultManager>();
-
-            if (resultManager == null)
-                resultManager = gameObject.AddComponent<Duel3DResultManager>();
-
-            if (!resultManager.Initialize(acceptedContext))
+            catch (System.Exception exception)
             {
-                Debug.LogError(
-                    "[ModuleZ] Duel3DResultManager rejected DuelContext."
-                );
-                return;
+                failureReason = stage + " failed: " + exception.Message;
+                return false;
             }
+        }
 
-            hudController = gameObject.AddComponent<Duel3DHUDController>();
-            hudController.BuildHUD();
-
-            ShowRivalIntroduction();
-            MarkCurrentRivalPersonalityCompleted();
-
-            gameObject.AddComponent<ModuleZ.UI.PauseMenu.DuelPauseMenuController>();
-
-            resultVisualController =
-                gameObject.AddComponent<Duel3DResultVisualController>();
-
-            feedbackManager =
-                gameObject.AddComponent<Duel3DGameFeedbackManager>();
-
-            feedbackManager.Initialize(
-                hudController,
-                resultVisualController
-            );
-
-            // Oculta HUD IA
-            if (false)
-            {
-                aiDebugInfo = gameObject.AddComponent<Duel3DAIDebugInfo>();
-                aiDebugInfo.Build();
-            }
-
-            RefreshPreview();
-            UpdateHUD();
-
-            ScheduleNextRivalAmbientComment();
-
-            Debug.Log("[ModuleZ] Duel3D Runtime iniciado con GameFeedbackManager.");
+        private void OnDestroy()
+        {
+            if (matchResolver != null)
+                matchResolver.OnMatchFinished -= HandleMatchFinished;
         }
 
         private void CheckMomentumShift()
@@ -343,6 +398,7 @@ namespace ModuleZ.Duel3D.Runtime
         private void CreateCityArena()
         {
             GameObject arenaObj = new GameObject("Duel3D_CityArena");
+            arenaObj.transform.SetParent(transform, true);
             arenaObj.AddComponent<Duel3DCityArenaBuilder>().Build();
         }
 
