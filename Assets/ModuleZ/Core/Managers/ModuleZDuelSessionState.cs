@@ -15,16 +15,18 @@ namespace ModuleZ.Core.Managers
             bool isRematch,
             Vector3 returnPosition)
         {
-            HasActiveDuel = true;
             RivalId = rivalId;
             IsRematch = isRematch;
             ReturnPosition = returnPosition;
+            HasActiveDuel = true;
         }
 
         public static void Clear()
         {
             HasActiveDuel = false;
+            RivalId = default;
             IsRematch = false;
+            ReturnPosition = Vector3.zero;
         }
     }
 }

@@ -44,6 +44,7 @@ namespace ModuleZ.Game.DuelTransition
         {
             if (!IsValid(context, out string failureReason))
             {
+                ModuleZDuelSessionState.Clear();
                 Debug.LogError(
                     "[ModuleZ] Duel transition failed: " + failureReason
                 );
@@ -53,9 +54,14 @@ namespace ModuleZ.Game.DuelTransition
             ModuleZGameState.IsPaused = false;
 
             if (ModuleZSceneController.Instance != null)
+            {
                 ModuleZSceneController.Instance.LoadDuel();
+            }
             else
+            {
+                ModuleZDuelSessionState.Clear();
                 Debug.LogError("[Module Z] No existe ModuleZSceneController.");
+            }
         }
 
         private static bool IsValid(

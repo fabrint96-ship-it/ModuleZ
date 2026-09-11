@@ -70,31 +70,66 @@ namespace ModuleZ.Duel3D.Runtime
             out string failureReason)
         {
             if (ModuleZDuelSessionState.HasActiveDuel)
-            {
-                acceptedContext = new DuelContext(
-                    ModuleZDuelSessionState.RivalId,
-                    ModuleZDuelSessionState.IsRematch,
-                    ModuleZDuelSessionState.ReturnPosition
+                return TryResolveActiveSession(
+                    out acceptedContext,
+                    out failureReason
                 );
-            }
-            else
-            {
-                // Transitional direct-scene fallback. The normal production
-                // path always arrives through an active session projected by
-                // DuelTransitionBridge.
-                acceptedContext = new DuelContext(
-                    ModuleZGameState.PendingDuelRival,
-                    ModuleZGameState.CurrentDuelIsRematch,
-                    ModuleZGameState.OpenWorldReturnPosition
-                );
-            }
+
+            return TryResolveDirectSceneFallback(
+                out acceptedContext,
+                out failureReason
+            );
+        }
+
+        private static bool TryResolveActiveSession(
+            out DuelContext acceptedContext,
+            out string failureReason)
+        {
+            acceptedContext = new DuelContext(
+                ModuleZDuelSessionState.RivalId,
+                ModuleZDuelSessionState.IsRematch,
+                ModuleZDuelSessionState.ReturnPosition
+            );
+
+            return TryValidateAcceptedContext(
+                acceptedContext,
+                "Active Duel session rival is invalid.",
+                out failureReason
+            );
+        }
+
+        private static bool TryResolveDirectSceneFallback(
+            out DuelContext acceptedContext,
+            out string failureReason)
+        {
+            Debug.LogWarning(
+                "[ModuleZ] DuelBootstrap using transitional direct-scene fallback."
+            );
+
+            acceptedContext = new DuelContext(
+                ModuleZGameState.PendingDuelRival,
+                ModuleZGameState.CurrentDuelIsRematch,
+                ModuleZGameState.OpenWorldReturnPosition
+            );
+
+            return TryValidateAcceptedContext(
+                acceptedContext,
+                "Direct-scene fallback rival is invalid.",
+                out failureReason
+            );
+        }
+
+        private static bool TryValidateAcceptedContext(
+            DuelContext acceptedContext,
+            string invalidRivalReason,
+            out string failureReason)
+        {
 
             if (!Enum.IsDefined(
                     typeof(ModuleZRivalId),
                     acceptedContext.RivalId))
             {
-                failureReason = "Legacy Duel rival state is invalid.";
-                acceptedContext = default;
+                failureReason = invalidRivalReason;
                 return false;
             }
 

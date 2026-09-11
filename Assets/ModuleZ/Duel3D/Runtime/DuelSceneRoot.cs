@@ -1,3 +1,4 @@
+using ModuleZ.Core.Managers;
 using UnityEngine;
 
 namespace ModuleZ.Duel3D.Runtime
@@ -85,6 +86,7 @@ namespace ModuleZ.Duel3D.Runtime
 
         private bool Fail(string failureReason)
         {
+            ModuleZDuelSessionState.Clear();
             State = LifecycleState.Failed;
             Debug.LogError("[ModuleZ] DuelSceneRoot failed: " + failureReason);
             return false;
