@@ -49,9 +49,6 @@ namespace ModuleZ.Duel3D.Runtime
                     return false;
                 }
 
-                Debug.Log(
-                    "[ModuleZ] Production Duel3D runtime created."
-                );
                 return true;
             }
             catch (Exception exception)
