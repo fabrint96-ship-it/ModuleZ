@@ -1,0 +1,9 @@
+{
+    "name": "ModuleZ.EditModeTests",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}
