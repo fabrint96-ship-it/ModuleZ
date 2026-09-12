@@ -1,5 +1,6 @@
 using System.IO;
 using ModuleZ.Core.Managers;
+using ModuleZ.Core.SaveSystem;
 using UnityEngine;
 
 namespace ModuleZ.Core.Settings
@@ -7,7 +8,7 @@ namespace ModuleZ.Core.Settings
     public static class ModuleZSettingsManager
     {
         private static string SettingsPath =>
-            Path.Combine(Application.persistentDataPath, "module_z_settings.json");
+            Path.Combine(ModuleZPersistencePaths.RootPath, "module_z_settings.json");
 
         public static void SaveSettings()
         {
@@ -18,6 +19,7 @@ namespace ModuleZ.Core.Settings
             };
 
             string json = JsonUtility.ToJson(data, true);
+            Directory.CreateDirectory(ModuleZPersistencePaths.RootPath);
             File.WriteAllText(SettingsPath, json);
 
             Debug.Log("[Module Z] Opciones guardadas.");
