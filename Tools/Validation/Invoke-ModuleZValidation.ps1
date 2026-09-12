@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("compile", "editmode", "playmode", "tests")]
+    [ValidateSet("static", "compile", "editmode", "playmode", "tests", "all")]
     [string]$Stage = "tests",
 
     [string]$UnityPath,
@@ -125,6 +125,45 @@ function Invoke-CompileStage {
     Write-Host "compile PASS (exit 0): $logPath"
 }
 
+function Invoke-StaticStage {
+    $validatorPath = Join-Path $PSScriptRoot `
+        "Static\Invoke-ModuleZStaticValidation.ps1"
+    $resultsPath = Join-Path $OutputPath "static-results.json"
+    $logPath = Join-Path $OutputPath "static.log"
+
+    if (-not (Test-Path -LiteralPath $validatorPath -PathType Leaf)) {
+        throw "Static validator was not found: $validatorPath"
+    }
+
+    Remove-Item -LiteralPath $resultsPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $logPath -Force -ErrorAction SilentlyContinue
+
+    & pwsh -NoProfile -File $validatorPath `
+        -RepositoryRoot $ProjectPath `
+        -OutputPath $OutputPath
+    $exitCode = $LASTEXITCODE
+
+    if ($exitCode -ne 0) {
+        $script:FailureExitCode = $exitCode
+        throw "Static validation failed with exit code $exitCode. Log: $logPath"
+    }
+
+    if (-not (Test-Path -LiteralPath $resultsPath -PathType Leaf)) {
+        throw "Static result JSON was not produced: $resultsPath"
+    }
+
+    $result = Get-Content -LiteralPath $resultsPath -Raw | ConvertFrom-Json
+    if ($result.overall -ne "PASS") {
+        throw "Static result JSON reports $($result.overall), not PASS."
+    }
+
+    if (-not (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+        throw "Static validation log was not produced: $logPath"
+    }
+
+    Write-Host "static PASS: $resultsPath; $logPath"
+}
+
 function Assert-TestResults {
     param(
         [Parameter(Mandatory)]
@@ -218,6 +257,9 @@ try {
     $OutputPath = (Resolve-Path -LiteralPath $OutputPath).Path
 
     switch ($Stage) {
+        "static" {
+            Invoke-StaticStage
+        }
         "compile" {
             Invoke-CompileStage
         }
@@ -228,6 +270,12 @@ try {
             Invoke-TestStage -TestPlatform "PlayMode"
         }
         "tests" {
+            Invoke-TestStage -TestPlatform "EditMode"
+            Invoke-TestStage -TestPlatform "PlayMode"
+        }
+        "all" {
+            Invoke-StaticStage
+            Invoke-CompileStage
             Invoke-TestStage -TestPlatform "EditMode"
             Invoke-TestStage -TestPlatform "PlayMode"
         }

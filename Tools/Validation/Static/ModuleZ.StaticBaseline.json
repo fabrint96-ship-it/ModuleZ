@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "80cff45d16981eb28eb3c7c88614cd37ca8c8864",
+  "ddolAllowlist": [
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZGameManager.cs", "scope": "ModuleZGameManager.Awake", "expression": "DontDestroyOnLoad(gameObject)", "count": 1, "reason": "Accepted application-scope manager." },
+    { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZSaveBootstrap.cs", "scope": "ModuleZSaveBootstrap.Awake", "expression": "DontDestroyOnLoad(gameObject)", "count": 1, "reason": "Accepted application-scope save bootstrap." },
+    { "file": "Assets/ModuleZ/Core/SceneLoading/ModuleZSceneController.cs", "scope": "ModuleZSceneController.Awake", "expression": "DontDestroyOnLoad(gameObject)", "count": 1, "reason": "Accepted application-scope scene controller." },
+    { "file": "Assets/ModuleZ/UI/Runtime/ModuleZUIManager.cs", "scope": "ModuleZUIManager.Awake", "expression": "DontDestroyOnLoad(gameObject)", "count": 1, "reason": "Accepted application-scope UI manager." },
+    { "file": "Assets/ModuleZ/UI/Runtime/ModuleZUIManager.cs", "scope": "ModuleZUIManager.EnsureEventSystem", "expression": "DontDestroyOnLoad(eventSystem)", "count": 1, "reason": "Accepted application-scope EventSystem." }
+  ],
+  "legacyInputAllowlist": [
+    { "file": "Assets/ModuleZ/Duel3D/AI/Duel3DAIDebugInfo.cs", "scope": "Duel3DAIDebugInfo.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy debug key consumer." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DOrbitCameraController.cs", "scope": "Duel3DOrbitCameraController.Update", "api": "GetAxis", "count": 2, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DOrbitCameraController.cs", "scope": "Duel3DOrbitCameraController.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DOrbitCameraController.cs", "scope": "Duel3DOrbitCameraController.Update", "api": "GetMouseButton", "count": 1, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DOrbitCameraController.cs", "scope": "Duel3DOrbitCameraController.Update", "api": "mouseScrollDelta", "count": 1, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DRuntimeBuilder.cs", "scope": "Duel3DRuntimeBuilder.Update", "api": "GetKeyDown", "count": 13, "reason": "Accepted legacy Duel command input." },
+    { "file": "Assets/ModuleZ/Game/Camera/ModuleZThirdPersonCamera.cs", "scope": "ModuleZThirdPersonCamera.LateUpdate", "api": "GetAxis", "count": 2, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Game/Camera/ModuleZThirdPersonCamera.cs", "scope": "ModuleZThirdPersonCamera.LateUpdate", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Game/Camera/ModuleZThirdPersonCamera.cs", "scope": "ModuleZThirdPersonCamera.LateUpdate", "api": "GetMouseButton", "count": 1, "reason": "Accepted legacy camera input." },
+    { "file": "Assets/ModuleZ/Game/Interaction/ModuleZPlayerInteraction.cs", "scope": "ModuleZPlayerInteraction.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy interaction input." },
+    { "file": "Assets/ModuleZ/Game/Player/ModuleZPlayerController.cs", "scope": "ModuleZPlayerController.Update", "api": "GetAxisRaw", "count": 2, "reason": "Accepted legacy movement input." },
+    { "file": "Assets/ModuleZ/UI/HUD/ModuleZAchievementsHUD.cs", "scope": "ModuleZAchievementsHUD.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy HUD input." },
+    { "file": "Assets/ModuleZ/UI/HUD/ModuleZStatsHUD.cs", "scope": "ModuleZStatsHUD.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy HUD input." },
+    { "file": "Assets/ModuleZ/UI/HUD/OpenWorldProgressHUD.cs", "scope": "OpenWorldProgressHUD.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy HUD input." },
+    { "file": "Assets/ModuleZ/UI/PauseMenu/DuelPauseMenuController.cs", "scope": "DuelPauseMenuController.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy pause input." },
+    { "file": "Assets/ModuleZ/UI/PauseMenu/OpenWorldPauseMenuController.cs", "scope": "OpenWorldPauseMenuController.Update", "api": "GetKeyDown", "count": 1, "reason": "Accepted legacy pause input." }
+  ],
+  "objectLookupAllowlist": [
+    { "file": "Assets/ModuleZ/Core/SceneLoading/ModuleZSceneController.cs", "scope": "ModuleZSceneController.LoadMainMenu", "api": "FindObjectOfType", "count": 1, "reason": "Existing transitional lookup." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DCameraBuilder.cs", "scope": "Duel3DCameraBuilder.Build", "api": "FindObjectOfType", "count": 1, "reason": "Existing transitional lookup." },
+    { "file": "Assets/ModuleZ/Duel3D/Runtime/Duel3DRuntimeBuilder.cs", "scope": "Duel3DRuntimeBuilder.TryBuild", "api": "FindObjectOfType", "count": 1, "reason": "Existing scene-local compatibility lookup." },
+    { "file": "Assets/ModuleZ/Duel3D/UI/Duel3DInputGuide.cs", "scope": "Duel3DInputGuide.Awake", "api": "FindObjectOfType", "count": 1, "reason": "Existing presentation lookup." },
+    { "file": "Assets/ModuleZ/Game/NPCs/ModuleZNPCConversationController.cs", "scope": "ModuleZNPCConversationController", "api": "GameObject.FindGameObjectWithTag", "count": 1, "reason": "Existing player lookup." },
+    { "file": "Assets/ModuleZ/OpenWorld/Encounters/ModuleZRivalWorldHUDController.cs", "scope": "ModuleZRivalWorldHUDController", "api": "GameObject.FindGameObjectWithTag", "count": 1, "reason": "Existing player lookup." },
+    { "file": "Assets/ModuleZ/UI/MainMenu/ModuleZMainMenuBuilder.cs", "scope": "ModuleZMainMenuBuilder", "api": "GameObject.Find", "count": 1, "reason": "Existing duplicate environment guard." },
+    { "file": "Assets/ModuleZ/UI/Runtime/ModuleZUIManager.cs", "scope": "ModuleZUIManager.EnsureEventSystem", "api": "FindObjectOfType", "count": 1, "reason": "Existing EventSystem lookup." }
+  ],
+  "coreDependencyAllowlist": [
+    { "file": "Assets/ModuleZ/Core/Achievements/ModuleZAchievementManager.cs", "domain": "OpenWorld", "count": 1, "reason": "Existing progression coupling." },
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZDuelSessionState.cs", "domain": "OpenWorld", "count": 1, "reason": "Existing ModuleZRivalId dependency." },
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZGameState.cs", "domain": "OpenWorld", "count": 2, "reason": "Existing rival/theme state dependency." },
+    { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZSaveData.cs", "domain": "OpenWorld", "count": 1, "reason": "Existing theme persistence dependency." },
+    { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZSaveManager.cs", "domain": "OpenWorld", "count": 1, "reason": "Existing rival progression update dependency." }
+  ],
+  "globalMutableAllowlist": [
+    { "file": "Assets/ModuleZ/Core/Achievements/ModuleZAchievementManager.cs", "symbols": ["initialized", "OnAchievementUnlocked"], "reason": "Existing achievement static state." },
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZDuelSessionState.cs", "symbols": ["HasActiveDuel", "RivalId", "IsRematch", "ReturnPosition"], "reason": "Existing transitional session state." },
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZGameManager.cs", "symbols": ["Instance"], "reason": "Existing application singleton accessor." },
+    { "file": "Assets/ModuleZ/Core/Managers/ModuleZGameState.cs", "symbols": ["OpenWorldReturnPosition", "ReturningFromDuel", "CurrentDuelRival", "RivalMadridDefeated", "RivalBarcelonaDefeated", "RivalValenciaDefeated", "RivalAndaluciaDefeated", "AndaluciaUnlocked", "DuelsWon", "DuelsLost", "DuelsAbandoned", "DuelWasCancelled", "DuelCompleted", "DuelWasLost", "DuelWasAbandoned", "LastDuelResultMessage", "PendingOpenWorldMessage", "IsPaused", "AudioEnabled", "FullscreenEnabled", "CurrentOpenWorldTheme", "MainProgressionCompleted", "CurrentDuelIsRematch", "RematchesWon", "RematchesLost", "RematchesAbandoned", "IsOverlayOpen", "RivalMadridPersonalityCompleted", "RivalBarcelonaPersonalityCompleted", "RivalValenciaPersonalityCompleted", "RivalAndaluciaPersonalityCompleted", "PendingDuelRival"], "reason": "Existing legacy global game state." },
+    { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZSaveBootstrap.cs", "symbols": ["loaded"], "reason": "Existing bootstrap guard." },
+    { "file": "Assets/ModuleZ/Core/SceneLoading/ModuleZSceneController.cs", "symbols": ["Instance"], "reason": "Existing application singleton accessor." },
+    { "file": "Assets/ModuleZ/Duel3D/Rules/Duel3DResultManager.cs", "symbols": ["Instance"], "reason": "Existing scene-local access mechanism." },
+    { "file": "Assets/ModuleZ/Game/NPCs/ModuleZNPCConversationController.cs", "symbols": ["nextGlobalAmbientTime"], "reason": "Existing ambient cooldown state." },
+    { "file": "Assets/ModuleZ/UI/HUD/ModuleZHUDOverlayCoordinator.cs", "symbols": ["Instance"], "reason": "Existing scene-local HUD access." },
+    { "file": "Assets/ModuleZ/UI/HUD/OpenWorldMessageHUD.cs", "symbols": ["Instance"], "reason": "Existing scene-local HUD access." },
+    { "file": "Assets/ModuleZ/UI/HUD/OpenWorldSystemMessageHUD.cs", "symbols": ["Instance"], "reason": "Existing scene-local HUD access." },
+    { "file": "Assets/ModuleZ/UI/Runtime/ModuleZUIManager.cs", "symbols": ["Instance"], "reason": "Existing application singleton accessor." }
+  ],
+  "hardcodedUiAllowlist": [
+    { "file": "Assets/ModuleZ/UI/PauseMenu/OpenWorldPauseMenuController.cs", "literals": ["Partida guardada.", "Partida guardada. Volviendo al menú..."], "reason": "Existing visible pause text." },
+    { "file": "Assets/ModuleZ/UI/PauseMenu/DuelPauseMenuController.cs", "literals": ["PAUSA DUELO 3D"], "reason": "Existing visible pause text." },
+    { "file": "Assets/ModuleZ/UI/HUD/ModuleZAchievementsHUD.cs", "literals": ["LOGROS MODULE Z"], "reason": "Existing visible HUD text." },
+    { "file": "Assets/ModuleZ/UI/HUD/ModuleZStatsHUD.cs", "literals": ["ESTADÍSTICAS MODULE Z"], "reason": "Existing visible HUD text." },
+    { "file": "Assets/ModuleZ/UI/HUD/OpenWorldProgressHUD.cs", "literals": ["PROGRESO MODULE Z"], "reason": "Existing visible HUD text." },
+    { "file": "Assets/ModuleZ/UI/HUD/OpenWorldZoneHUD.cs", "literals": ["Zona: "], "reason": "Existing visible HUD prefix." },
+    { "file": "Assets/ModuleZ/UI/MainMenu/ModuleZMainMenuBuilder.cs", "literals": ["CRÉDITOS", "LOGROS", "MODULE Z", "DUELS · PUZZLES · OPEN WORLD", "No hay partida guardada.", "No hay partida para borrar.", "Pulsa otra vez Borrar Partida para confirmar.", "Partida guardada eliminada.", "OPCIONES", "Opciones restauradas."], "reason": "Existing visible Main Menu text." },
+    { "file": "Assets/ModuleZ/OpenWorld/Encounters/RivalStateWorldLabel.cs", "literals": ["✓ DERROTADO\\nE: REMATCH", "⚔ DISPONIBLE", "🔒 BLOQUEADO"], "reason": "Existing visible rival state text." },
+    { "file": "Assets/ModuleZ/Duel3D/UI/Duel3DHUDController.cs", "literals": ["DUELO 3D — ", "VICTORIA", "DERROTA", "EMPATE"], "reason": "Existing visible Duel HUD text." }
+  ]
+}
