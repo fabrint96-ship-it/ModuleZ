@@ -14,7 +14,7 @@ namespace ModuleZ.Core.SaveSystem
             get
             {
                 return Path.Combine(
-                    Application.persistentDataPath,
+                    ModuleZPersistencePaths.RootPath,
                     SaveFileName
                 );
             }
@@ -60,6 +60,7 @@ namespace ModuleZ.Core.SaveSystem
             data.achievements = ModuleZAchievementManager.GetAll();
 
             string json = JsonUtility.ToJson(data, true);
+            Directory.CreateDirectory(ModuleZPersistencePaths.RootPath);
             File.WriteAllText(SavePath, json);
 
             Debug.Log("[ModuleZ] Partida guardada: " + SavePath);

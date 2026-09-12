@@ -44,6 +44,7 @@
     { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZSaveManager.cs", "domain": "OpenWorld", "count": 1, "reason": "Existing rival progression update dependency." }
   ],
   "globalMutableAllowlist": [
+    { "file": "Assets/ModuleZ/Core/SaveSystem/ModuleZPersistencePaths.cs", "symbols": ["rootOverride"], "reason": "Reviewed private, controlled persistence-root override required for safe automated runtime validation." },
     { "file": "Assets/ModuleZ/Core/Achievements/ModuleZAchievementManager.cs", "symbols": ["initialized", "OnAchievementUnlocked"], "reason": "Existing achievement static state." },
     { "file": "Assets/ModuleZ/Core/Managers/ModuleZDuelSessionState.cs", "symbols": ["HasActiveDuel", "RivalId", "IsRematch", "ReturnPosition"], "reason": "Existing transitional session state." },
     { "file": "Assets/ModuleZ/Core/Managers/ModuleZGameManager.cs", "symbols": ["Instance"], "reason": "Existing application singleton accessor." },
