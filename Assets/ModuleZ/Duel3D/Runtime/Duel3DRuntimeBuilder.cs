@@ -492,11 +492,19 @@ namespace ModuleZ.Duel3D.Runtime
             ClampCurrentOrigin();
 
             if (Input.GetKeyDown(KeyCode.Space))
-                TryPlacePlayerPiece();
+                TryCommitCurrentPlayerPiece();
         }
 
-        private void TryPlacePlayerPiece()
+        public bool TryCommitCurrentPlayerPiece()
         {
+            if (!buildCompleted || !isActiveAndEnabled || board == null ||
+                matchResolver == null || matchConfig == null ||
+                rivalProfile == null || previewRoot == null ||
+                forbiddenRoot == null || !playerTurn ||
+                matchResolver.MatchFinished || resolvingRemoval ||
+                ModuleZGameState.IsPaused)
+                return false;
+
             Vector3Int[] playerPieceCells =
                 ZPiece3DShape.GetCells(currentOrigin, currentRotation);
 
@@ -507,7 +515,7 @@ namespace ModuleZ.Duel3D.Runtime
                     lastPlayerPieceCells))
             {
                 feedbackManager?.PlayInvalid("No puedes tocar tu última pieza Z");
-                return;
+                return false;
             }
 
             bool placed = Duel3DPiecePlacement.PlacePiece(
@@ -520,7 +528,7 @@ namespace ModuleZ.Duel3D.Runtime
             if (!placed)
             {
                 feedbackManager?.PlayInvalid("Posición inválida");
-                return;
+                return false;
             }
 
             lastPlayerPieceCells = playerPieceCells;
@@ -531,7 +539,7 @@ namespace ModuleZ.Duel3D.Runtime
             AfterPiecePlaced(Duel3DCellOwner.Player, false);
 
             if (matchResolver.MatchFinished)
-                return;
+                return true;
 
             playerTurn = false;
 
@@ -543,6 +551,7 @@ namespace ModuleZ.Duel3D.Runtime
             feedbackManager?.PlayTurnChanged(false);
 
             Invoke(nameof(PlayOpponentTurn), rivalProfile.reactionDelay);
+            return true;
         }
 
         private void PlayOpponentTurn()
