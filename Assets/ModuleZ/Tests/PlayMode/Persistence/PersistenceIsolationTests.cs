@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace ModuleZ.Tests.PlayMode.Persistence
 {
+    [Category("Persistence")]
     public sealed class PersistenceIsolationTests
     {
         private const string PathsTypeName =
@@ -43,13 +44,13 @@ namespace ModuleZ.Tests.PlayMode.Persistence
         [Test]
         public void PERSIST_001_DefaultRootAndPERSIST_007_ClearRestoreProductionRoot()
         {
-            Assert.That(CurrentRoot(), Is.EqualTo(Application.persistentDataPath));
+            Assert.That(CurrentRoot(), Is.EqualTo(ExpectedProcessDefaultRoot()));
 
             SetOverride();
             Assert.That(CurrentRoot(), Is.EqualTo(Path.GetFullPath(isolatedRoot)));
 
             RuntimeContractProbe.InvokePublicStatic(pathsType, "ClearRootOverride");
-            Assert.That(CurrentRoot(), Is.EqualTo(Application.persistentDataPath));
+            Assert.That(CurrentRoot(), Is.EqualTo(ExpectedProcessDefaultRoot()));
         }
 
         [Test]
@@ -85,7 +86,7 @@ namespace ModuleZ.Tests.PlayMode.Persistence
         [Test]
         public void PERSIST_008_OverrideDoesNotLeakBetweenTests()
         {
-            Assert.That(CurrentRoot(), Is.EqualTo(Application.persistentDataPath));
+            Assert.That(CurrentRoot(), Is.EqualTo(ExpectedProcessDefaultRoot()));
             Assert.That(Directory.Exists(isolatedRoot), Is.False);
         }
 
@@ -134,6 +135,16 @@ namespace ModuleZ.Tests.PlayMode.Persistence
         private static string RealPath(string fileName)
         {
             return Path.Combine(Application.persistentDataPath, fileName);
+        }
+
+        private static string ExpectedProcessDefaultRoot()
+        {
+            string configured = Environment.GetEnvironmentVariable(
+                "MODULEZ_PERSISTENCE_ROOT"
+            );
+            return configured == null
+                ? Application.persistentDataPath
+                : Path.GetFullPath(configured);
         }
 
         private static FileFingerprint Fingerprint(string path)
