@@ -1,0 +1,94 @@
+name: ModuleZ static validation
+
+on:
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    name: Static architecture and wrapper guards
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check PowerShell syntax and fail-closed invocation guards
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $scripts = @(
+            (Join-Path $env:GITHUB_WORKSPACE 'Tools/Validation/Invoke-ModuleZValidation.ps1'),
+            (Join-Path $env:GITHUB_WORKSPACE 'Tools/Validation/Static/Invoke-ModuleZStaticValidation.ps1')
+          )
+          foreach ($scriptPath in $scripts) {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $scriptPath, [ref]$tokens, [ref]$parseErrors
+            ) | Out-Null
+            if ($parseErrors.Count -ne 0) {
+              throw "PowerShell syntax failed for $scriptPath`: $($parseErrors | Out-String)"
+            }
+          }
+
+          # Both calls must reject before Unity resolution. Even a guard regression
+          # cannot start Unity: the supplied executable path is verified absent.
+          $wrapper = $scripts[0]
+          $unavailableUnity = Join-Path $env:RUNNER_TEMP 'modulez-ci-no-unity/Unity.exe'
+          if (Test-Path -LiteralPath $unavailableUnity) {
+            throw 'The deliberately unavailable Unity path unexpectedly exists.'
+          }
+          $PSNativeCommandUseErrorActionPreference = $false
+          function Assert-GuardRejects {
+            param([string[]]$Arguments, [string]$Expected)
+            $output = (& pwsh -NoProfile -File $wrapper @Arguments `
+              -UnityPath $unavailableUnity 2>&1 | Out-String)
+            $code = $LASTEXITCODE
+            if ($code -eq 0 -or -not $output.Contains($Expected)) {
+              throw "Wrapper guard failed: arguments=$($Arguments -join ' ') exit=$code output=$output"
+            }
+            Write-Host "Wrapper guard PASS: $($Arguments -join ' ')"
+          }
+          Assert-GuardRejects -Arguments @('smoke') `
+            -Expected 'requires explicit -EnableSmoke opt-in'
+          Assert-GuardRejects -Arguments @('static', '-EnableSmoke') `
+            -Expected '-EnableSmoke is valid only with the smoke stage'
+          # GitHub's pwsh runner propagates LASTEXITCODE from native children.
+          # Both nonzero exits were required and verified above.
+          $global:LASTEXITCODE = 0
+
+      - name: Run existing static architecture validator
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $validator = Join-Path $env:GITHUB_WORKSPACE `
+            'Tools/Validation/Static/Invoke-ModuleZStaticValidation.ps1'
+          $artifacts = Join-Path $env:GITHUB_WORKSPACE 'artifacts/validation'
+          & pwsh -NoProfile -File $validator `
+            -RepositoryRoot $env:GITHUB_WORKSPACE -OutputPath $artifacts
+          if ($LASTEXITCODE -ne 0) {
+            throw "Static validator failed with exit code $LASTEXITCODE."
+          }
+          $resultPath = Join-Path $artifacts 'static-results.json'
+          if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) {
+            throw 'Static validator did not produce its machine-readable result.'
+          }
+          $result = Get-Content -LiteralPath $resultPath -Raw | ConvertFrom-Json
+          if ($result.overall -ne 'PASS') {
+            throw "Static result JSON reports $($result.overall), not PASS."
+          }
+
+      - name: Publish static validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: modulez-static-validation
+          path: |
+            artifacts/validation/static-results.json
+            artifacts/validation/static.log
+          if-no-files-found: warn
