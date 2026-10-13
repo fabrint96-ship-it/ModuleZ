@@ -1,10 +1,20 @@
+using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.Achievements;
 using UnityEngine;
 
 namespace ModuleZ.Core.SaveSystem
 {
+    public enum ModuleZLoadGameStatus
+    {
+        Success,
+        NotFound,
+        InvalidData,
+        ReadError
+    }
+
     public static class ModuleZSaveManager
     {
         private const string SaveFileName = "modulez_save.json";
@@ -68,20 +78,14 @@ namespace ModuleZ.Core.SaveSystem
 
         public static void LoadGame()
         {
-            if (!File.Exists(SavePath))
-            {
-                Debug.Log("[ModuleZ] No existe partida guardada.");
-                return;
-            }
+            TryLoadGame();
+        }
 
-            string json = File.ReadAllText(SavePath);
-            ModuleZSaveData data = JsonUtility.FromJson<ModuleZSaveData>(json);
-
-            if (data == null)
-            {
-                Debug.LogWarning("[ModuleZ] SaveData inválido.");
-                return;
-            }
+        public static ModuleZLoadGameStatus TryLoadGame()
+        {
+            ModuleZLoadGameStatus status = TryReadSaveData(out ModuleZSaveData data);
+            if (status != ModuleZLoadGameStatus.Success)
+                return status;
 
             ModuleZGameState.OpenWorldReturnPosition =
                 new Vector3(data.returnX, data.returnY, data.returnZ);
@@ -127,16 +131,105 @@ namespace ModuleZ.Core.SaveSystem
             ModuleZAchievementManager.EvaluateAll();
 
             Debug.Log("[ModuleZ] Partida cargada.");
+            return ModuleZLoadGameStatus.Success;
+        }
+
+        private static ModuleZLoadGameStatus TryReadSaveData(out ModuleZSaveData data)
+        {
+            data = null;
+            string json;
+            try
+            {
+                json = File.ReadAllText(SavePath);
+            }
+            catch (FileNotFoundException)
+            {
+                Debug.Log("[ModuleZ] No existe partida guardada.");
+                return ModuleZLoadGameStatus.NotFound;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Debug.Log("[ModuleZ] No existe partida guardada.");
+                return ModuleZLoadGameStatus.NotFound;
+            }
+            catch (Exception exception) when (exception is IOException ||
+                exception is UnauthorizedAccessException ||
+                exception is ArgumentException ||
+                exception is System.Security.SecurityException ||
+                exception is NotSupportedException)
+            {
+                Debug.LogWarning("[ModuleZ] No se pudo leer la partida: " + exception.Message);
+                return ModuleZLoadGameStatus.ReadError;
+            }
+
+            try
+            {
+                string trimmed = json.Trim();
+                // All saves written to modulez_save.json have these core
+                // fields. Later progression and achievement fields are optional.
+                if (!trimmed.StartsWith("{", StringComparison.Ordinal) ||
+                    !trimmed.EndsWith("}", StringComparison.Ordinal) ||
+                    !Regex.IsMatch(json, "\\\"duelsWon\\\"\\s*:\\s*-?\\d+") ||
+                    !Regex.IsMatch(json, "\\\"duelsLost\\\"\\s*:\\s*-?\\d+") ||
+                    !Regex.IsMatch(json, "\\\"duelsAbandoned\\\"\\s*:\\s*-?\\d+"))
+                    return ModuleZLoadGameStatus.InvalidData;
+
+                data = JsonUtility.FromJson<ModuleZSaveData>(json);
+            }
+            catch (Exception exception) when (exception is ArgumentException ||
+                exception is FormatException)
+            {
+                Debug.LogWarning("[ModuleZ] SaveData inválido: " + exception.Message);
+                return ModuleZLoadGameStatus.InvalidData;
+            }
+
+            if (!IsValid(data))
+            {
+                Debug.LogWarning("[ModuleZ] SaveData inválido.");
+                return ModuleZLoadGameStatus.InvalidData;
+            }
+
+            return ModuleZLoadGameStatus.Success;
+        }
+
+        private static bool IsValid(ModuleZSaveData data)
+        {
+            return data != null &&
+                !float.IsNaN(data.returnX) && !float.IsInfinity(data.returnX) &&
+                !float.IsNaN(data.returnY) && !float.IsInfinity(data.returnY) &&
+                !float.IsNaN(data.returnZ) && !float.IsInfinity(data.returnZ) &&
+                data.duelsWon >= 0 && data.duelsLost >= 0 &&
+                data.duelsAbandoned >= 0 && data.rematchesWon >= 0 &&
+                data.rematchesLost >= 0 && data.rematchesAbandoned >= 0 &&
+                Enum.IsDefined(data.currentOpenWorldTheme.GetType(),
+                    data.currentOpenWorldTheme);
         }
 
         public static void DeleteSave()
         {
-            if (File.Exists(SavePath))
+            TryDeleteSave();
+        }
+
+        public static bool TryDeleteSave()
+        {
+            try
+            {
+                // File.Delete is a no-op for a missing file, but unlike a
+                // File.Exists guard it reports access and I/O failures.
                 File.Delete(SavePath);
-
-            ModuleZAchievementManager.ResetAll();
-
-            Debug.Log("[ModuleZ] Partida eliminada.");
+                ModuleZAchievementManager.ResetAll();
+                Debug.Log("[ModuleZ] Partida eliminada.");
+                return true;
+            }
+            catch (Exception exception) when (exception is IOException ||
+                exception is UnauthorizedAccessException ||
+                exception is ArgumentException ||
+                exception is System.Security.SecurityException ||
+                exception is NotSupportedException)
+            {
+                Debug.LogWarning("[ModuleZ] No se pudo borrar la partida: " + exception.Message);
+                return false;
+            }
         }
 
         public static bool HasSave()
@@ -146,11 +239,8 @@ namespace ModuleZ.Core.SaveSystem
 
         public static ModuleZSaveData GetSaveData()
         {
-            if (!File.Exists(SavePath))
-                return null;
-
-            string json = File.ReadAllText(SavePath);
-            return JsonUtility.FromJson<ModuleZSaveData>(json);
+            return TryReadSaveData(out ModuleZSaveData data) ==
+                ModuleZLoadGameStatus.Success ? data : null;
         }
     }
 }

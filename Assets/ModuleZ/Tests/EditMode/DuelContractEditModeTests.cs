@@ -70,7 +70,7 @@ namespace ModuleZ.Tests.EditMode
             object invalidContext = Context(invalidRival, false, Vector3.zero);
             object[] args = { invalidContext, null };
             bool accepted = (bool)RequireType(TransitionBridgeName)
-                .GetMethod("Begin", BindingFlags.Public | BindingFlags.Static)
+                .GetMethod("Begin", new[] { RequireType(ContextName), typeof(string).MakeByRefType() })
                 .Invoke(null, args);
 
             Assert.That(accepted, Is.False);
@@ -104,7 +104,7 @@ namespace ModuleZ.Tests.EditMode
                 Vector3 position = new Vector3(4f, 1f, -8f);
                 object[] args = { Context(rival, true, position), null };
                 bool accepted = (bool)RequireType(TransitionBridgeName)
-                    .GetMethod("Begin", BindingFlags.Public | BindingFlags.Static)
+                    .GetMethod("Begin", new[] { RequireType(ContextName), typeof(string).MakeByRefType() })
                     .Invoke(null, args);
 
                 Assert.That(accepted, Is.True);
@@ -134,7 +134,7 @@ namespace ModuleZ.Tests.EditMode
                 object invalidRival = Enum.ToObject(RequireType(RivalName), int.MaxValue);
                 object[] invalidArgs = { Context(invalidRival, false, Vector3.zero), null };
                 bool invalidAccepted = (bool)RequireType(TransitionBridgeName)
-                    .GetMethod("Begin", BindingFlags.Public | BindingFlags.Static)
+                    .GetMethod("Begin", new[] { RequireType(ContextName), typeof(string).MakeByRefType() })
                     .Invoke(null, invalidArgs);
                 Assert.That(invalidAccepted, Is.False);
                 Assert.That(invalidArgs[1], Is.EqualTo("Duel rival is invalid."));
