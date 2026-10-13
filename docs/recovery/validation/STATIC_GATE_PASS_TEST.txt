@@ -1,0 +1,2 @@
+S1.6-08C-03 static PR gate PASS test.
+This file has no production or validation behavior.
