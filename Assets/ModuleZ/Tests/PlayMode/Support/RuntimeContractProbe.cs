@@ -72,6 +72,21 @@ namespace ModuleZ.Tests.PlayMode.Support
             return method.Invoke(null, arguments);
         }
 
+        public static object InvokePublicInstance(
+            object target,
+            string methodName,
+            params object[] arguments)
+        {
+            Assert.That(target, Is.Not.Null);
+            MethodInfo method = target.GetType().GetMethod(
+                methodName,
+                PublicInstance
+            );
+            Assert.That(method, Is.Not.Null,
+                $"Public instance method not found: {target.GetType().FullName}.{methodName}");
+            return method.Invoke(target, arguments);
+        }
+
         public static string GetStateName(Component root)
         {
             object state = GetPublicInstanceProperty(root, "State");

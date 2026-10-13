@@ -1,8 +1,10 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("static", "compile", "editmode", "playmode", "tests", "persistence", "shutdown", "all")]
+    [ValidateSet("static", "compile", "editmode", "playmode", "tests", "persistence", "smoke", "shutdown", "all")]
     [string]$Stage = "tests",
+
+    [switch]$EnableSmoke,
 
     [string]$UnityPath,
 
@@ -446,7 +448,8 @@ function Invoke-TestStage {
         throw "$TestPlatform log was not produced: $logPath"
     }
 
-    $displayName = if ($ArtifactName -eq "shutdown") { "Shutdown" }
+    $displayName = if ($ArtifactName -eq "smoke") { "Smoke" }
+        elseif ($ArtifactName -eq "shutdown") { "Shutdown" }
         elseif ($ArtifactName -eq "persistence") { "Persistence" }
         else { $TestPlatform }
     Assert-TestResults `
@@ -457,6 +460,13 @@ function Invoke-TestStage {
 }
 
 try {
+    if ($EnableSmoke -and $Stage -ne "smoke") {
+        throw "-EnableSmoke is valid only with the smoke stage."
+    }
+    if ($Stage -eq "smoke" -and -not $EnableSmoke) {
+        throw "The smoke stage requires explicit -EnableSmoke opt-in."
+    }
+
     $script:ResolvedUnityPath = Resolve-UnityExecutable
     $ProjectPath = (Resolve-Path -LiteralPath $ProjectPath).Path
     Assert-NoReparseAncestors $OutputPath
@@ -475,15 +485,33 @@ try {
             Invoke-TestStage -TestPlatform "EditMode"
         }
         "playmode" {
-            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Shutdown"
+            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Smoke;!Shutdown"
         }
         "tests" {
             Invoke-TestStage -TestPlatform "EditMode"
-            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Shutdown"
+            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Smoke;!Shutdown"
         }
         "persistence" {
             Invoke-TestStage -TestPlatform "PlayMode" `
                 -CategoryFilter "Persistence" -ArtifactName "persistence"
+        }
+        "smoke" {
+            $smokeMarker = "MODULEZ_CANONICAL_SMOKE_OPT_IN"
+            $previousSmokeMarker = [Environment]::GetEnvironmentVariable(
+                $smokeMarker, "Process"
+            )
+            try {
+                [Environment]::SetEnvironmentVariable(
+                    $smokeMarker, "1", "Process"
+                )
+                Invoke-TestStage -TestPlatform "PlayMode" `
+                    -CategoryFilter "Smoke" -ArtifactName "smoke"
+            }
+            finally {
+                [Environment]::SetEnvironmentVariable(
+                    $smokeMarker, $previousSmokeMarker, "Process"
+                )
+            }
         }
         "shutdown" {
             Invoke-TestStage -TestPlatform "PlayMode" `
@@ -493,7 +521,7 @@ try {
             Invoke-StaticStage
             Invoke-CompileStage
             Invoke-TestStage -TestPlatform "EditMode"
-            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Shutdown"
+            Invoke-TestStage -TestPlatform "PlayMode" -CategoryFilter "!Smoke;!Shutdown"
         }
     }
 }

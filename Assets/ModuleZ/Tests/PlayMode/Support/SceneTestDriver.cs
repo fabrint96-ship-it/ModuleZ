@@ -8,6 +8,7 @@ namespace ModuleZ.Tests.PlayMode.Support
 {
     internal static class SceneTestDriver
     {
+        public const string BootPath = "Assets/ModuleZ/Scenes/Boot.unity";
         public const string OpenWorldPath = "Assets/ModuleZ/Scenes/OpenWorld.unity";
         public const string DuelPath = "Assets/ModuleZ/Scenes/Duel.unity";
         private const float TimeoutSeconds = 20f;
@@ -52,6 +53,26 @@ namespace ModuleZ.Tests.PlayMode.Support
 
             Assert.Fail(
                 $"Timed out waiting for {rootTypeName} Ready/R3 after " +
+                $"{TimeoutSeconds} seconds. {diagnostics()}"
+            );
+        }
+
+        public static IEnumerator WaitForActiveScene(
+            string scenePath,
+            Func<string> diagnostics)
+        {
+            float deadline = Time.realtimeSinceStartup + TimeoutSeconds;
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                Scene scene = SceneManager.GetActiveScene();
+                if (scene.IsValid() && scene.isLoaded && scene.path == scenePath)
+                    yield break;
+
+                yield return null;
+            }
+
+            Assert.Fail(
+                $"Timed out waiting for active scene {scenePath} after " +
                 $"{TimeoutSeconds} seconds. {diagnostics()}"
             );
         }
