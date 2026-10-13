@@ -58,6 +58,9 @@ jobs:
             -Expected 'requires explicit -EnableSmoke opt-in'
           Assert-GuardRejects -Arguments @('static', '-EnableSmoke') `
             -Expected '-EnableSmoke is valid only with the smoke stage'
+          # GitHub's pwsh runner propagates LASTEXITCODE from native children.
+          # Both nonzero exits were required and verified above.
+          $global:LASTEXITCODE = 0
 
       - name: Run existing static architecture validator
         shell: pwsh
