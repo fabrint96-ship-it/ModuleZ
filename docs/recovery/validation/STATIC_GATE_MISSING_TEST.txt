@@ -1,0 +1,2 @@
+S1.6-08C-03 required-check absence test.
+This document does not change runtime or validation behavior.
