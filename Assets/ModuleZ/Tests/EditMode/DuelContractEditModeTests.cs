@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -19,21 +20,37 @@ namespace ModuleZ.Tests.EditMode
         private const string RivalName = "ModuleZ.OpenWorld.Encounters.ModuleZRivalId";
         private const string SessionName = "ModuleZ.Core.Managers.ModuleZDuelSessionState";
         private const string GameStateName = "ModuleZ.Core.Managers.ModuleZGameState";
+        private const string SaveManagerName = "ModuleZ.Core.SaveSystem.ModuleZSaveManager";
+        private const string PersistencePathsName = "ModuleZ.Core.SaveSystem.ModuleZPersistencePaths";
+        private const string ThemeName = "ModuleZ.OpenWorld.Runtime.OpenWorldThemeId";
 
         private object capturedContext;
         private object capturedResult;
         private int captureCount;
+        private Dictionary<FieldInfo, object> priorSession;
+        private Dictionary<FieldInfo, object> priorGameState;
 
         [SetUp]
         public void SetUp()
         {
+            priorGameState = Snapshot(RequireType(GameStateName));
+            priorSession = Snapshot(RequireType(SessionName));
             InvokeSession("Clear");
         }
 
         [TearDown]
         public void TearDown()
         {
-            InvokeSession("Clear");
+            try
+            {
+                if (priorGameState != null)
+                    Restore(priorGameState);
+            }
+            finally
+            {
+                if (priorSession != null)
+                    Restore(priorSession);
+            }
         }
 
         [Test]
@@ -62,10 +79,10 @@ namespace ModuleZ.Tests.EditMode
         }
 
         [Test]
-        public void L1_CONTEXT_002_ValidEntryPublishesTheAcceptedContextPayload()
+        public void L1_CONTEXT_002_STATE_ENTRY_001_ValidEntryPublishesTheAcceptedContextPayload()
         {
-            // Begin also writes Legacy compatibility fields. Restore exactly
-            // the public fields it changes so EditMode tests stay isolated.
+            // STATE-ENTRY-001: Begin writes nine Legacy compatibility fields.
+            // Restore exactly the public fields it changes.
             string[] names = {
                 "PendingDuelRival", "CurrentDuelRival", "CurrentDuelIsRematch",
                 "OpenWorldReturnPosition", "ReturningFromDuel", "DuelCompleted",
@@ -96,15 +113,143 @@ namespace ModuleZ.Tests.EditMode
                 Assert.That(SessionField("RivalId"), Is.EqualTo(rival));
                 Assert.That(SessionField("IsRematch"), Is.EqualTo(true));
                 Assert.That(SessionField("ReturnPosition"), Is.EqualTo(position));
-                Assert.That(gameState.GetField("PendingDuelRival").GetValue(null),
-                    Is.EqualTo(rival));
+                var expected = new Dictionary<string, object> {
+                    { "PendingDuelRival", rival },
+                    { "CurrentDuelRival", rival },
+                    { "CurrentDuelIsRematch", true },
+                    { "OpenWorldReturnPosition", position },
+                    { "ReturningFromDuel", true },
+                    { "DuelCompleted", false },
+                    { "DuelWasCancelled", false },
+                    { "DuelWasLost", false },
+                    { "DuelWasAbandoned", false }
+                };
+                foreach (KeyValuePair<string, object> entry in expected)
+                    Assert.That(gameState.GetField(entry.Key).GetValue(null),
+                        Is.EqualTo(entry.Value), entry.Key);
+
+                // Rejection must leave both the active session and every
+                // published Legacy projection exactly as they were.
+                var publishedSession = Snapshot(RequireType(SessionName));
+                object invalidRival = Enum.ToObject(RequireType(RivalName), int.MaxValue);
+                object[] invalidArgs = { Context(invalidRival, false, Vector3.zero), null };
+                bool invalidAccepted = (bool)RequireType(TransitionBridgeName)
+                    .GetMethod("Begin", BindingFlags.Public | BindingFlags.Static)
+                    .Invoke(null, invalidArgs);
+                Assert.That(invalidAccepted, Is.False);
+                Assert.That(invalidArgs[1], Is.EqualTo("Duel rival is invalid."));
+                AssertUnchanged(publishedSession);
+                foreach (KeyValuePair<string, object> entry in expected)
+                    Assert.That(gameState.GetField(entry.Key).GetValue(null),
+                        Is.EqualTo(entry.Value), entry.Key + " after invalid Begin");
             }
             finally
             {
-                foreach (KeyValuePair<FieldInfo, object> entry in prior)
-                    entry.Key.SetValue(null, entry.Value);
-                InvokeSession("Clear");
+                Restore(prior);
             }
+        }
+
+        [Test]
+        public void STATE_RESET_001_ResetRestoresThirtyDefaultsAndPreservesConfiguration()
+        {
+            Type gameState = RequireType(GameStateName);
+            var original = Snapshot(gameState);
+            Assert.That(original.Count, Is.EqualTo(32), "GameState public field inventory");
+            var defaults = new Dictionary<string, object> {
+                { "OpenWorldReturnPosition", new Vector3(0f, 0.1f, -4f) },
+                { "ReturningFromDuel", false },
+                { "CurrentDuelRival", Enum.Parse(RequireType(RivalName), "Madrid") },
+                { "RivalMadridDefeated", false },
+                { "RivalBarcelonaDefeated", false },
+                { "RivalValenciaDefeated", false },
+                { "RivalAndaluciaDefeated", false },
+                { "AndaluciaUnlocked", false },
+                { "DuelsWon", 0 },
+                { "DuelsLost", 0 },
+                { "DuelsAbandoned", 0 },
+                { "DuelWasCancelled", false },
+                { "DuelCompleted", false },
+                { "DuelWasLost", false },
+                { "DuelWasAbandoned", false },
+                { "LastDuelResultMessage", "" },
+                { "PendingOpenWorldMessage", "" },
+                { "IsPaused", false },
+                { "CurrentOpenWorldTheme", Enum.Parse(RequireType(ThemeName), "Madrid70s") },
+                { "MainProgressionCompleted", false },
+                { "CurrentDuelIsRematch", false },
+                { "RematchesWon", 0 },
+                { "RematchesLost", 0 },
+                { "RematchesAbandoned", 0 },
+                { "IsOverlayOpen", false },
+                { "RivalMadridPersonalityCompleted", false },
+                { "RivalBarcelonaPersonalityCompleted", false },
+                { "RivalValenciaPersonalityCompleted", false },
+                { "RivalAndaluciaPersonalityCompleted", false },
+                { "PendingDuelRival", Enum.Parse(RequireType(RivalName), "Madrid") }
+            };
+            Assert.That(defaults.Count, Is.EqualTo(30));
+
+            try
+            {
+                SetDistinctiveGameStateValues(gameState);
+
+                gameState.GetMethod("ResetGameState", BindingFlags.Public | BindingFlags.Static)
+                    .Invoke(null, null);
+                foreach (KeyValuePair<string, object> entry in defaults)
+                    Assert.That(gameState.GetField(entry.Key).GetValue(null),
+                        Is.EqualTo(entry.Value), entry.Key);
+                Assert.That(gameState.GetField("AudioEnabled").GetValue(null), Is.False);
+                Assert.That(gameState.GetField("FullscreenEnabled").GetValue(null), Is.False);
+            }
+            finally
+            {
+                Restore(original);
+            }
+        }
+
+        [Test]
+        public void STATE_LOAD_ABSENT_001_MissingIsolatedSaveDoesNotMutateState()
+        {
+            var gameState = Snapshot(RequireType(GameStateName));
+            var session = Snapshot(RequireType(SessionName));
+            Type paths = RequireType(PersistencePathsName);
+            string originalRoot = (string)paths.GetProperty("RootPath").GetValue(null);
+            string isolatedRoot = Path.Combine(Path.GetTempPath(),
+                "ModuleZ-EditMode-AbsentSave-" + Guid.NewGuid().ToString("N"));
+            Assert.That(Directory.Exists(isolatedRoot), Is.False);
+            Assert.That(File.Exists(Path.Combine(isolatedRoot, "modulez_save.json")), Is.False);
+            Assert.That(Path.GetFullPath(isolatedRoot), Is.Not.EqualTo(Path.GetFullPath(originalRoot)));
+            string realProfile = Path.GetFullPath(Application.persistentDataPath)
+                .TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            Assert.That(Path.GetFullPath(isolatedRoot).StartsWith(realProfile,
+                StringComparison.OrdinalIgnoreCase), Is.False);
+
+            try
+            {
+                paths.GetMethod("SetRootOverride", BindingFlags.Public | BindingFlags.Static)
+                    .Invoke(null, new object[] { isolatedRoot });
+                Assert.That(paths.GetProperty("RootPath").GetValue(null), Is.EqualTo(isolatedRoot));
+                SetDistinctiveGameStateValues(RequireType(GameStateName));
+                InvokeSession("StartDuel", Enum.Parse(RequireType(RivalName), "Valencia"),
+                    true, new Vector3(13f, 2f, -9f));
+                var expectedGameState = Snapshot(RequireType(GameStateName));
+                var expectedSession = Snapshot(RequireType(SessionName));
+                RequireType(SaveManagerName)
+                    .GetMethod("LoadGame", BindingFlags.Public | BindingFlags.Static)
+                    .Invoke(null, null);
+                AssertUnchanged(expectedGameState);
+                AssertUnchanged(expectedSession);
+                Assert.That(Directory.Exists(isolatedRoot), Is.False,
+                    "A missing-save read must not create storage");
+            }
+            finally
+            {
+                paths.GetMethod("ClearRootOverride", BindingFlags.Public | BindingFlags.Static)
+                    .Invoke(null, null);
+                Restore(gameState);
+                Restore(session);
+            }
+            Assert.That(paths.GetProperty("RootPath").GetValue(null), Is.EqualTo(originalRoot));
         }
 
         [Test]
@@ -230,6 +375,52 @@ namespace ModuleZ.Tests.EditMode
         {
             return RequireType(SessionName).GetField(name, BindingFlags.Public | BindingFlags.Static)
                 .GetValue(null);
+        }
+
+        private static Dictionary<FieldInfo, object> Snapshot(Type type)
+        {
+            return type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                .ToDictionary(field => field, field => field.GetValue(null));
+        }
+
+        private static void SetDistinctiveGameStateValues(Type gameState)
+        {
+            foreach (FieldInfo field in gameState.GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                object sentinel;
+                if (field.FieldType == typeof(bool))
+                    sentinel = field.Name == "AudioEnabled" ||
+                        field.Name == "FullscreenEnabled" ? (object)false : true;
+                else if (field.FieldType == typeof(int))
+                    sentinel = 937;
+                else if (field.FieldType == typeof(string))
+                    sentinel = "ep02-sentinel";
+                else if (field.FieldType == typeof(Vector3))
+                    sentinel = new Vector3(44f, 55f, 66f);
+                else if (field.FieldType == RequireType(RivalName))
+                    sentinel = Enum.Parse(field.FieldType, "Barcelona");
+                else if (field.FieldType == RequireType(ThemeName))
+                    sentinel = Enum.Parse(field.FieldType, "Barcelona70s");
+                else
+                {
+                    Assert.Fail("Unrecognized GameState field: " + field.Name);
+                    continue;
+                }
+                field.SetValue(null, sentinel);
+            }
+        }
+
+        private static void AssertUnchanged(Dictionary<FieldInfo, object> snapshot)
+        {
+            foreach (KeyValuePair<FieldInfo, object> entry in snapshot)
+                Assert.That(entry.Key.GetValue(null), Is.EqualTo(entry.Value),
+                    entry.Key.DeclaringType.Name + "." + entry.Key.Name);
+        }
+
+        private static void Restore(Dictionary<FieldInfo, object> snapshot)
+        {
+            foreach (KeyValuePair<FieldInfo, object> entry in snapshot)
+                entry.Key.SetValue(null, entry.Value);
         }
 
         private static void InvokeSession(string name, params object[] args)
