@@ -56,8 +56,12 @@ namespace ModuleZ.OpenWorld.Runtime
             }
             catch (Exception exception)
             {
+                // The destination is already durable. Do not roll back only
+                // the in-memory projection and contradict the saved state.
                 transitioning = false;
-                Debug.LogError("[ModuleZ] Destino guardado, pero la escena no cargó: " + exception.Message);
+                Debug.LogError("[ModuleZ] Destino guardado, pero la escena no cargó. " +
+                    "Permanece aquí; vuelve a activar el portal para reintentar la carga. " +
+                    exception.Message);
             }
         }
     }

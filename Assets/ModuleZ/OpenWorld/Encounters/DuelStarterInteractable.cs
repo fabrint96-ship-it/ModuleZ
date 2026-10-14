@@ -15,7 +15,23 @@ namespace ModuleZ.OpenWorld.Encounters
         public ModuleZRivalId rivalId = ModuleZRivalId.Madrid;
 
         private bool duelStarting;
+        private bool awaitingSceneReady;
         private DuelTransitionBridge.Attempt pendingAttempt;
+
+        private void Update()
+        {
+            if (!awaitingSceneReady || pendingAttempt == null ||
+                pendingAttempt.IsLoadRequested)
+                return;
+
+            awaitingSceneReady = false;
+            if (!pendingAttempt.IsReadyConfirmed)
+            {
+                pendingAttempt = null;
+                duelStarting = false;
+                ShowMessage("No se pudo iniciar el duelo. Vuelve al menú para recuperar la partida.", 4f);
+            }
+        }
 
         private void Awake()
         {
@@ -127,6 +143,8 @@ namespace ModuleZ.OpenWorld.Encounters
                 duelStarting = false;
                 Debug.LogError("[ModuleZ] No se pudo cargar el duelo: " + failureReason);
             }
+            else
+                awaitingSceneReady = attempt.IsLoadRequested;
         }
 
         private void OnDisable()
@@ -142,10 +160,13 @@ namespace ModuleZ.OpenWorld.Encounters
         private void CancelPendingTransition()
         {
             CancelInvoke(nameof(StartDuel));
-            if (pendingAttempt != null)
+            // Once scene loading is requested the bridge, not the departing
+            // OpenWorld object, owns the attempt until Ready or failure.
+            if (pendingAttempt != null && !pendingAttempt.IsLoadRequested)
                 DuelTransitionBridge.Cancel(pendingAttempt);
             pendingAttempt = null;
             duelStarting = false;
+            awaitingSceneReady = false;
         }
 
         private string GetChallengeMessage()

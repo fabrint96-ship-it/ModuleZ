@@ -31,7 +31,10 @@ namespace ModuleZ.Core.SceneLoading
         private void OnDestroy()
         {
             if (Instance == this)
+            {
                 SceneManager.sceneLoaded -= OnSceneLoaded;
+                Instance = null;
+            }
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

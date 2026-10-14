@@ -6,6 +6,7 @@ using ModuleZ.OpenWorld.Encounters;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 namespace ModuleZ.Duel3D.Rules
 {
@@ -16,6 +17,8 @@ namespace ModuleZ.Duel3D.Rules
         private bool resultResolved;
         private DuelContext acceptedContext;
         private bool hasAcceptedContext;
+        private ulong acceptedSessionRevision;
+        private bool acceptedFromSession;
         private bool pendingPersistence;
         private float returnDelay;
         private Text retryMessage;
@@ -40,10 +43,19 @@ namespace ModuleZ.Duel3D.Rules
 
         public bool Initialize(DuelContext context)
         {
+            return Initialize(context, ModuleZDuelSessionState.Revision,
+                ModuleZDuelSessionState.HasActiveDuel);
+        }
+
+        internal bool Initialize(DuelContext context, ulong sessionRevision,
+            bool fromSession)
+        {
             if (hasAcceptedContext)
                 return false;
 
             acceptedContext = context;
+            acceptedSessionRevision = sessionRevision;
+            acceptedFromSession = fromSession;
             hasAcceptedContext = true;
             return true;
         }
@@ -58,6 +70,22 @@ namespace ModuleZ.Duel3D.Rules
                 Debug.LogError(
                     "[ModuleZ] Duel result has no accepted DuelContext."
                 );
+                return;
+            }
+
+            if (!acceptedFromSession)
+            {
+                if (DuelResultBridge.Complete(acceptedContext, result,
+                        (context, acceptedResult) => { }, out string trialFailure))
+                    ShowTrialMode();
+                else
+                    Debug.LogError("[ModuleZ] Duel result rejected: " + trialFailure);
+                return;
+            }
+
+            if (!AcceptedSessionStillCurrent())
+            {
+                Debug.LogError("[ModuleZ] Duel result belongs to an obsolete session.");
                 return;
             }
 
@@ -96,6 +124,14 @@ namespace ModuleZ.Duel3D.Rules
             if (resultResolved)
                 return;
 
+            if (!ModuleZSaveManager.BeginDuelResultApplication(
+                    (int)context.RivalId, context.IsRematch,
+                    context.ReturnPosition, acceptedSessionRevision))
+            {
+                Debug.LogError("[ModuleZ] Duel result application lost session ownership.");
+                return;
+            }
+
             resultResolved = true;
 
             switch (result.Outcome)
@@ -113,10 +149,57 @@ namespace ModuleZ.Duel3D.Rules
                     break;
             }
 
-            ModuleZSaveManager.ConfirmAppliedDuelResult(
-                ModuleZDuelSessionState.Revision);
+            if (!ModuleZSaveManager.ConfirmAppliedDuelResult(
+                    (int)context.RivalId, context.IsRematch,
+                    context.ReturnPosition, (int)result.RivalId,
+                    acceptedSessionRevision))
+            {
+                Debug.LogError("[ModuleZ] Applied Duel result cannot be authorized for saving.");
+                return;
+            }
             returnDelay = result.Outcome == DuelOutcome.Abandoned ? 0.8f : 1.5f;
             PersistAppliedResult();
+        }
+
+        private bool AcceptedSessionStillCurrent()
+        {
+            return ModuleZDuelSessionState.HasActiveDuel &&
+                ModuleZDuelSessionState.Revision == acceptedSessionRevision &&
+                ModuleZDuelSessionState.RivalId == acceptedContext.RivalId &&
+                ModuleZDuelSessionState.IsRematch == acceptedContext.IsRematch &&
+                ModuleZDuelSessionState.ReturnPosition == acceptedContext.ReturnPosition;
+        }
+
+        private void ShowTrialMode()
+        {
+            if (resultResolved)
+                return;
+            resultResolved = true;
+            ModuleZSaveManager.MarkDirectDuelAsNonPersistable();
+            ShowSaveRetry(ModuleZSaveGameStatus.LifecycleRejected);
+            retryMessage.text = "Duelo abierto en modo de prueba: el resultado no se aplica ni se guarda.";
+            Button button = retryCanvas.GetComponentInChildren<Button>();
+            if (button != null)
+            {
+                button.gameObject.name = "ExitTrialModeButton";
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(ExitTrialMode);
+                Text label = button.GetComponentInChildren<Text>();
+                if (label != null)
+                    label.text = "Salir sin guardar";
+            }
+        }
+
+        private void ExitTrialMode()
+        {
+            if (acceptedFromSession || !resultResolved)
+                return;
+            if (ModuleZSceneController.Instance != null)
+                ModuleZSceneController.Instance.ReturnToMainMenu();
+            else
+                // Standalone Duel has no application controller by design.
+                // Boot is the safe no-save exit for this transitional mode.
+                SceneManager.LoadScene(ModuleZSceneController.BootScene);
         }
 
         // This action only retries storage. The accepted result and all of its

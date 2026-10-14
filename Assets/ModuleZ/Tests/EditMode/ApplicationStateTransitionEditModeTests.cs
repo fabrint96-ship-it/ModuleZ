@@ -292,6 +292,56 @@ namespace ModuleZ.Tests.EditMode
         }
 
         [Test]
+        public void LIFE_005A_ResultAuthorizationRequiresSameAcceptedSessionAndConfirmation()
+        {
+            object madrid = Enum.ToObject(rival, 0);
+            Vector3 returnPosition = new Vector3(4f, 0f, 7f);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { madrid, false, (object)returnPosition });
+            ulong revision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, returnPosition, revision), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "An applied result is not publishable until confirmed.");
+            Assert.That(ConfirmResult(0, false, returnPosition, 1, revision), Is.False,
+                "A different result rival cannot confirm this session.");
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(ConfirmResult(0, false, returnPosition, 0, revision), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { madrid, false, (object)returnPosition });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "A published result cannot authorize a later identical session.");
+        }
+
+        [Test]
+        public void LIFE_005B_ReplacedSessionCannotConfirmOrPublishPendingResult()
+        {
+            Vector3 returnPosition = Vector3.one;
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)returnPosition });
+            ulong oldRevision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, returnPosition, oldRevision), Is.True);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)returnPosition });
+            Assert.That(ConfirmResult(0, false, returnPosition, 0, oldRevision), Is.False);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            session.GetMethod("Clear").Invoke(null, null);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "Losing the session must remain blocked outside Duel as well.");
+        }
+
+        [Test]
+        public void LIFE_005C_NoSessionCannotCreateResultAuthorization()
+        {
+            ulong revision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, Vector3.zero, revision), Is.False);
+            Assert.That(ConfirmResult(0, false, Vector3.zero, 0, revision), Is.False);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)Vector3.zero });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+        }
+
+        [Test]
         public void STATE_LOAD_STATUS_001_MissingAndMalformedAreNonMutating()
         {
             var before = Snapshot(gameState);
@@ -507,6 +557,26 @@ namespace ModuleZ.Tests.EditMode
 
         private object Save() => saveManager.GetMethod("TrySaveGame", PublicStatic)
             .Invoke(null, null);
+
+        private bool BeginResult(int rivalId, bool rematch,
+            Vector3 returnPosition, ulong revision)
+        {
+            MethodInfo method = saveManager.GetMethod("BeginDuelResultApplication",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null,
+                new object[] { rivalId, rematch, returnPosition, revision });
+        }
+
+        private bool ConfirmResult(int rivalId, bool rematch,
+            Vector3 returnPosition, int resultRival, ulong revision)
+        {
+            MethodInfo method = saveManager.GetMethod("ConfirmAppliedDuelResult",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null,
+                new object[] { rivalId, rematch, returnPosition, resultRival, revision });
+        }
 
         private void ConfirmFreshStart()
         {

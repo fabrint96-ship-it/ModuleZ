@@ -57,14 +57,16 @@ authorities; `ModuleZGameState` remains a Legacy projection.
 | Invalid/read/apply failed load | `LifecycleRejected` | Successful load or complete New Game reset. |
 | Bridge attempt pending | `LifecycleRejected` | Exact owner commits or cancels. |
 | Bridge ownership lost / partial Legacy rollback | `LifecycleRejected` | Successful load or complete New Game reset; do not assume foreign fields are owned. |
-| Active unresolved Duel or direct Duel scene fallback | `LifecycleRejected` | Accept and apply a result, or leave/clear the scene/session via its existing lifecycle. Direct fallback cannot publish mid-match personality progress. |
+| Active unresolved Duel | `LifecycleRejected` | Only a validated result from the same accepted session may begin result application. |
+| Direct Duel scene fallback | `LifecycleRejected` | Trial gameplay is allowed; results are rejected before effects, with an explicit unsaved exit to MainMenu. |
 | Accepted/applied Duel result | Allowed when its transient authorization matches session `Revision` | On failure, explicit retry in Duel; pause/quit may also attempt save. |
 
 `HasActiveDuel` is never the sole test for authorization. The current Duel
 scene is also guarded because the transitional direct-scene fallback has no
 active session but can mutate personality progress before a result. The bridge's attempt
 identity, session revision, load bracket and applied-result authorization all have distinct
-roles. Successful scene load releases the attempt gate. Cancel releases only
+roles. `LoadDuel()` only requests the scene: the attempt gate is released only
+after the matching session-backed `DuelSceneRoot` reaches `Ready`. Cancel releases only
 its own token; cancellation with lost ownership marks state uncertain. The
 compatibility `Begin(context, out string)` now uses a tracked attempt rather
 than publishing an unguarded projection. Its caller does not receive the token,
@@ -102,6 +104,45 @@ before restoring to avoid overwriting a differing producer. Value equality is
 not a full ownership proof if another producer writes the same value; this is
 a documented transitional limitation. A synchronous scene-load exception after
 successful publication cannot be rolled back as an atomic disk transaction.
+The saved theme, return position and return flag remain committed after a
+synchronous scene-load exception. The player remains in the current scene and
+may reactivate the portal to retry the load; this is not a second save
+transaction or a guarantee that later scene initialization succeeds.
+
+## REVIEW-03 readiness and result-identity corrections
+
+The bridge retains the exact attempt while scene loading is requested. Its
+`sceneLoaded` observation binds the requested Duel scene handle; the
+`DuelSceneRoot` reports `Ready` only after successful runtime composition.
+Confirmation requires that handle, the same accepted `DuelContext`, an active
+session with the original revision and matching payload, and a session-backed
+bootstrap origin. `LoadDuel()` returning is not confirmation. The departing
+OpenWorld interactable cannot cancel an already requested load. A failed or
+destroyed root, another loaded scene, or 20 seconds without `Ready` retires
+the attempt, retains the conservative save block and clears only the session
+still owned by that attempt. Late callbacks cannot release another token.
+If the origin OpenWorld remains active, its interactable drops its local
+pending state and explains that a menu recovery is required; it does not
+pretend a second attempt can bypass the conservative gate. The existing
+SceneController clears its static `Instance` on destruction, including after
+test-owned controller teardown.
+If the persistent SceneController itself disappears before its readiness
+watcher runs, the unreleased gate remains fail-closed; explicit fresh-start or
+successful-load recovery is then required.
+
+`DuelBootstrap` captures whether its accepted context came from an active
+session and the revision at acceptance. The runtime builder passes this
+provenance to the result manager without reading a competing Legacy context.
+Before applying a result, the result manager checks that the captured session
+still owns the accepted payload. The save gate brackets result application,
+confirms only the matching result rival/context/revision after effects have
+been applied, and checks the same identity again on save or retry. A changed
+session leaves the provisional result unpublished even after leaving Duel;
+successful publication consumes the authorization. The direct-scene fallback
+can still build and play, but cannot apply Victory/Defeat/Abandon progression:
+it shows trial-mode notice and an exit to MainMenu without saving. Its
+non-persistable Legacy projection stays blocked until a valid load or complete
+New Game reset. This is not durable recovery of an unsaved result.
 
 ## Tests and validation
 
@@ -114,11 +155,17 @@ Its setup/teardown uses isolated deletion, reset and internal fresh-start
 confirmation, then restores prior GameState, session and achievements. The
 internal call is exercised through reflection because the test assembly cannot
 reference predefined Assembly-CSharp directly; it is not a public test seam.
-`DuelResultPersistenceTests` is a PlayMode Persistence-category case with a
+`DuelResultPersistenceTests` is a PlayMode Persistence-category fixture with a
 per-test child root under the wrapper's process isolation root. It forces a
 temporary-write failure, verifies the live retry UI, retries only the save,
-checks the result counter remains singular, then restores static state.
-No test accesses the real profile directly or needs gameplay scene loading.
+checks the result counter remains singular, and adds direct-fallback and
+production-scene readiness/failure/destruction/timeout/late-callback checks.
+The new EditMode cases check result identity, unconfirmed publication,
+replacement with the same payload, and absence of a session. Every fixture
+clears its isolated gate before restoring prior GameState, session and
+achievement snapshots. No test accesses the real profile directly. The new
+PlayMode scene cases are **NOT RUN** until separate Unity authorization;
+their injected failures are test-local and do not change production scenes.
 
 Static validation on the implementation branch: **PASS**, 30 PASS / 2 WARN /
 0 FAIL. `STATIC-020` flags the explicit private transient gate fields (and

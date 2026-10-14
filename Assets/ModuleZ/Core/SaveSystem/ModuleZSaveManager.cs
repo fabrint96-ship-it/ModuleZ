@@ -43,14 +43,60 @@ namespace ModuleZ.Core.SaveSystem
         private static bool uncertainLoadState;
         private static ulong appliedResultRevision;
         private static bool hasAppliedResultRevision;
+        private static bool resultApplicationPending;
+        private static int appliedResultRival;
+        private static bool appliedResultRematch;
+        private static Vector3 appliedResultReturnPosition;
 
-        internal static void ConfirmAppliedDuelResult(ulong sessionRevision)
+        internal static bool BeginDuelResultApplication(
+            int rival, bool rematch, Vector3 returnPosition,
+            ulong sessionRevision)
         {
-            if (ModuleZDuelSessionState.Revision == sessionRevision)
-            {
-                appliedResultRevision = sessionRevision;
-                hasAppliedResultRevision = true;
-            }
+            if (resultApplicationPending || provisionalTransitionOwner != null ||
+                uncertainTransitionState || uncertainLoadState ||
+                !SessionMatches(rival, rematch, returnPosition, sessionRevision))
+                return false;
+            resultApplicationPending = true;
+            hasAppliedResultRevision = false;
+            appliedResultRival = rival;
+            appliedResultRematch = rematch;
+            appliedResultReturnPosition = returnPosition;
+            appliedResultRevision = sessionRevision;
+            return true;
+        }
+
+        internal static bool ConfirmAppliedDuelResult(
+            int rival, bool rematch, Vector3 returnPosition,
+            int resultRival, ulong sessionRevision)
+        {
+            if (!resultApplicationPending ||
+                appliedResultRevision != sessionRevision ||
+                appliedResultRival != rival ||
+                appliedResultRematch != rematch ||
+                appliedResultReturnPosition != returnPosition ||
+                resultRival != rival ||
+                !SessionMatches(rival, rematch, returnPosition, sessionRevision))
+                return false;
+            hasAppliedResultRevision = true;
+            return true;
+        }
+
+        // A direct-scene trial has no session authority. Keep its in-memory
+        // Legacy projection from being published after leaving the Duel scene.
+        internal static void MarkDirectDuelAsNonPersistable()
+        {
+            uncertainTransitionState = true;
+            hasAppliedResultRevision = false;
+        }
+
+        private static bool SessionMatches(int rival, bool rematch,
+            Vector3 returnPosition, ulong revision)
+        {
+            return ModuleZDuelSessionState.HasActiveDuel &&
+                ModuleZDuelSessionState.Revision == revision &&
+                (int)ModuleZDuelSessionState.RivalId == rival &&
+                ModuleZDuelSessionState.IsRematch == rematch &&
+                ModuleZDuelSessionState.ReturnPosition == returnPosition;
         }
 
         internal static bool BeginProvisionalTransition(object owner)
@@ -81,6 +127,7 @@ namespace ModuleZ.Core.SaveSystem
             uncertainTransitionState = false;
             uncertainLoadState = false;
             hasAppliedResultRevision = false;
+            resultApplicationPending = false;
             return true;
         }
 
@@ -109,11 +156,13 @@ namespace ModuleZ.Core.SaveSystem
         {
             if (loading || provisionalTransitionOwner != null ||
                 uncertainTransitionState || uncertainLoadState ||
-                ((ModuleZDuelSessionState.HasActiveDuel ||
+                ((resultApplicationPending ||
+                  ModuleZDuelSessionState.HasActiveDuel ||
                   (Application.isPlaying && SceneManager.GetActiveScene().name ==
                    ModuleZSceneController.DuelScene)) &&
                  (!hasAppliedResultRevision ||
-                  appliedResultRevision != ModuleZDuelSessionState.Revision)))
+                  !SessionMatches(appliedResultRival, appliedResultRematch,
+                      appliedResultReturnPosition, appliedResultRevision))))
                 return ModuleZSaveGameStatus.LifecycleRejected;
 
             ModuleZSaveData data;
@@ -210,6 +259,11 @@ namespace ModuleZ.Core.SaveSystem
             }
 
             Debug.Log("[ModuleZ] Partida guardada: " + SavePath);
+            if (resultApplicationPending)
+            {
+                resultApplicationPending = false;
+                hasAppliedResultRevision = false;
+            }
             return ModuleZSaveGameStatus.Success;
         }
 
@@ -316,6 +370,7 @@ namespace ModuleZ.Core.SaveSystem
                 ApplyLoadedData(data);
                 uncertainTransitionState = false;
                 hasAppliedResultRevision = false;
+                resultApplicationPending = false;
                 Debug.Log("[ModuleZ] Partida cargada.");
                 return ModuleZLoadGameStatus.Success;
             }
