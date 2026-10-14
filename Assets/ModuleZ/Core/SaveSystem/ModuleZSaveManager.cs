@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.Achievements;
 using UnityEngine;
@@ -12,7 +12,8 @@ namespace ModuleZ.Core.SaveSystem
         Success,
         NotFound,
         InvalidData,
-        ReadError
+        ReadError,
+        ApplyError
     }
 
     public static class ModuleZSaveManager
@@ -87,6 +88,35 @@ namespace ModuleZ.Core.SaveSystem
             if (status != ModuleZLoadGameStatus.Success)
                 return status;
 
+            LoadSnapshot before;
+            try
+            {
+                before = new LoadSnapshot();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("[ModuleZ] No se pudo preparar la carga: " + exception.Message);
+                return ModuleZLoadGameStatus.ApplyError;
+            }
+
+            try
+            {
+                ApplyLoadedData(data);
+                Debug.Log("[ModuleZ] Partida cargada.");
+                return ModuleZLoadGameStatus.Success;
+            }
+            catch (Exception exception)
+            {
+                // In particular, an achievement notification may throw after
+                // GameState and some achievements have already changed.
+                before.Restore();
+                Debug.LogWarning("[ModuleZ] No se pudo aplicar la partida: " + exception.Message);
+                return ModuleZLoadGameStatus.ApplyError;
+            }
+        }
+
+        private static void ApplyLoadedData(ModuleZSaveData data)
+        {
             ModuleZGameState.OpenWorldReturnPosition =
                 new Vector3(data.returnX, data.returnY, data.returnZ);
 
@@ -129,9 +159,95 @@ namespace ModuleZ.Core.SaveSystem
 
             ModuleZAchievementManager.LoadStates(data.achievements);
             ModuleZAchievementManager.EvaluateAll();
+        }
 
-            Debug.Log("[ModuleZ] Partida cargada.");
-            return ModuleZLoadGameStatus.Success;
+        private sealed class LoadSnapshot
+        {
+            private readonly ModuleZSaveData state;
+            private readonly bool rematch;
+            private readonly bool completed;
+            private readonly bool cancelled;
+            private readonly bool lost;
+            private readonly bool abandoned;
+            private readonly bool paused;
+            private readonly List<ModuleZAchievementState> achievements;
+            private readonly List<bool> unlocked = new List<bool>();
+            private readonly List<string> dates = new List<string>();
+
+            internal LoadSnapshot()
+            {
+                state = new ModuleZSaveData {
+                    returnX = ModuleZGameState.OpenWorldReturnPosition.x,
+                    returnY = ModuleZGameState.OpenWorldReturnPosition.y,
+                    returnZ = ModuleZGameState.OpenWorldReturnPosition.z,
+                    rivalMadridDefeated = ModuleZGameState.RivalMadridDefeated,
+                    rivalBarcelonaDefeated = ModuleZGameState.RivalBarcelonaDefeated,
+                    rivalValenciaDefeated = ModuleZGameState.RivalValenciaDefeated,
+                    rivalAndaluciaDefeated = ModuleZGameState.RivalAndaluciaDefeated,
+                    andaluciaUnlocked = ModuleZGameState.AndaluciaUnlocked,
+                    duelsWon = ModuleZGameState.DuelsWon,
+                    duelsLost = ModuleZGameState.DuelsLost,
+                    duelsAbandoned = ModuleZGameState.DuelsAbandoned,
+                    currentOpenWorldTheme = ModuleZGameState.CurrentOpenWorldTheme,
+                    mainProgressionCompleted = ModuleZGameState.MainProgressionCompleted,
+                    rematchesWon = ModuleZGameState.RematchesWon,
+                    rematchesLost = ModuleZGameState.RematchesLost,
+                    rematchesAbandoned = ModuleZGameState.RematchesAbandoned,
+                    rivalMadridPersonalityCompleted = ModuleZGameState.RivalMadridPersonalityCompleted,
+                    rivalBarcelonaPersonalityCompleted = ModuleZGameState.RivalBarcelonaPersonalityCompleted,
+                    rivalValenciaPersonalityCompleted = ModuleZGameState.RivalValenciaPersonalityCompleted,
+                    rivalAndaluciaPersonalityCompleted = ModuleZGameState.RivalAndaluciaPersonalityCompleted
+                };
+                rematch = ModuleZGameState.CurrentDuelIsRematch;
+                completed = ModuleZGameState.DuelCompleted;
+                cancelled = ModuleZGameState.DuelWasCancelled;
+                lost = ModuleZGameState.DuelWasLost;
+                abandoned = ModuleZGameState.DuelWasAbandoned;
+                paused = ModuleZGameState.IsPaused;
+                achievements = ModuleZAchievementManager.GetAll();
+                foreach (ModuleZAchievementState achievement in achievements)
+                {
+                    unlocked.Add(achievement.unlocked);
+                    dates.Add(achievement.unlockedDate);
+                }
+            }
+
+            internal void Restore()
+            {
+                // Do not call progression or EvaluateAll during rollback.
+                // Those are the application operations that may have failed.
+                ModuleZGameState.OpenWorldReturnPosition = new Vector3(
+                    state.returnX, state.returnY, state.returnZ);
+                ModuleZGameState.RivalMadridDefeated = state.rivalMadridDefeated;
+                ModuleZGameState.RivalBarcelonaDefeated = state.rivalBarcelonaDefeated;
+                ModuleZGameState.RivalValenciaDefeated = state.rivalValenciaDefeated;
+                ModuleZGameState.RivalAndaluciaDefeated = state.rivalAndaluciaDefeated;
+                ModuleZGameState.AndaluciaUnlocked = state.andaluciaUnlocked;
+                ModuleZGameState.DuelsWon = state.duelsWon;
+                ModuleZGameState.DuelsLost = state.duelsLost;
+                ModuleZGameState.DuelsAbandoned = state.duelsAbandoned;
+                ModuleZGameState.CurrentOpenWorldTheme = state.currentOpenWorldTheme;
+                ModuleZGameState.MainProgressionCompleted = state.mainProgressionCompleted;
+                ModuleZGameState.RematchesWon = state.rematchesWon;
+                ModuleZGameState.RematchesLost = state.rematchesLost;
+                ModuleZGameState.RematchesAbandoned = state.rematchesAbandoned;
+                ModuleZGameState.RivalMadridPersonalityCompleted = state.rivalMadridPersonalityCompleted;
+                ModuleZGameState.RivalBarcelonaPersonalityCompleted = state.rivalBarcelonaPersonalityCompleted;
+                ModuleZGameState.RivalValenciaPersonalityCompleted = state.rivalValenciaPersonalityCompleted;
+                ModuleZGameState.RivalAndaluciaPersonalityCompleted = state.rivalAndaluciaPersonalityCompleted;
+                ModuleZGameState.CurrentDuelIsRematch = rematch;
+                ModuleZGameState.DuelCompleted = completed;
+                ModuleZGameState.DuelWasCancelled = cancelled;
+                ModuleZGameState.DuelWasLost = lost;
+                ModuleZGameState.DuelWasAbandoned = abandoned;
+                ModuleZGameState.IsPaused = paused;
+                ModuleZAchievementManager.LoadStates(achievements);
+                for (int i = 0; i < achievements.Count; i++)
+                {
+                    achievements[i].unlocked = unlocked[i];
+                    achievements[i].unlockedDate = dates[i];
+                }
+            }
         }
 
         private static ModuleZLoadGameStatus TryReadSaveData(out ModuleZSaveData data)
@@ -164,14 +280,10 @@ namespace ModuleZ.Core.SaveSystem
 
             try
             {
-                string trimmed = json.Trim();
-                // All saves written to modulez_save.json have these core
-                // fields. Later progression and achievement fields are optional.
-                if (!trimmed.StartsWith("{", StringComparison.Ordinal) ||
-                    !trimmed.EndsWith("}", StringComparison.Ordinal) ||
-                    !Regex.IsMatch(json, "\\\"duelsWon\\\"\\s*:\\s*-?\\d+") ||
-                    !Regex.IsMatch(json, "\\\"duelsLost\\\"\\s*:\\s*-?\\d+") ||
-                    !Regex.IsMatch(json, "\\\"duelsAbandoned\\\"\\s*:\\s*-?\\d+"))
+                // JsonUtility tolerates missing and mistyped members. Validate
+                // the complete JSON grammar and root field types first, while
+                // retaining the optional fields of older current-name saves.
+                if (!SaveJsonShape.IsValid(json))
                     return ModuleZLoadGameStatus.InvalidData;
 
                 data = JsonUtility.FromJson<ModuleZSaveData>(json);
@@ -202,7 +314,276 @@ namespace ModuleZ.Core.SaveSystem
                 data.duelsAbandoned >= 0 && data.rematchesWon >= 0 &&
                 data.rematchesLost >= 0 && data.rematchesAbandoned >= 0 &&
                 Enum.IsDefined(data.currentOpenWorldTheme.GetType(),
-                    data.currentOpenWorldTheme);
+                    data.currentOpenWorldTheme) &&
+                ValidAchievements(data.achievements);
+        }
+
+        private static bool ValidAchievements(List<ModuleZAchievementState> states)
+        {
+            if (states == null)
+                return true;
+
+            var ids = new HashSet<ModuleZAchievementId>();
+            foreach (ModuleZAchievementState state in states)
+            {
+                if (state == null ||
+                    !Enum.IsDefined(typeof(ModuleZAchievementId), state.achievementId) ||
+                    !ids.Add(state.achievementId))
+                    return false;
+            }
+            return true;
+        }
+
+        // Root-aware JSON grammar check, not a second deserializer. Unknown
+        // fields remain compatible; known fields must have their saved type.
+        private sealed class SaveJsonShape
+        {
+            private enum Kind { Object, Array, String, Integer, Number, Boolean, Null }
+            private readonly string source;
+            private readonly HashSet<string> rootNames = new HashSet<string>();
+            private int position;
+
+            private SaveJsonShape(string source) { this.source = source; }
+
+            internal static bool IsValid(string source)
+            {
+                if (string.IsNullOrWhiteSpace(source))
+                    return false;
+                var reader = new SaveJsonShape(source);
+                reader.WhiteSpace();
+                if (!reader.Object(true, 0))
+                    return false;
+                reader.WhiteSpace();
+                return reader.position == source.Length &&
+                    reader.rootNames.Contains("duelsWon") &&
+                    reader.rootNames.Contains("duelsLost") &&
+                    reader.rootNames.Contains("duelsAbandoned");
+            }
+
+            private bool Object(bool root, int depth, bool achievement = false)
+            {
+                if (depth > 32 || !Take('{')) return false;
+                var memberNames = achievement ? new HashSet<string>() : null;
+                WhiteSpace();
+                if (Take('}')) return !achievement;
+                do
+                {
+                    WhiteSpace();
+                    if (!String(out string name)) return false;
+                    WhiteSpace();
+                    if (!Take(':')) return false;
+                    WhiteSpace();
+                    int valueStart = position;
+                    Kind kind;
+                    if (root && name == "achievements")
+                    {
+                        kind = Kind.Array;
+                        if (!AchievementArray(depth + 1)) return false;
+                    }
+                    else if (!Value(depth + 1, out kind)) return false;
+                    if (root && (!rootNames.Add(name) || !ValidRootType(name, kind) ||
+                        (IsIntegerField(name) && !int.TryParse(
+                            source.Substring(valueStart, position - valueStart),
+                            System.Globalization.NumberStyles.AllowLeadingSign,
+                            System.Globalization.CultureInfo.InvariantCulture, out _))))
+                        return false;
+                    if (achievement && (!memberNames.Add(name) ||
+                        !ValidAchievementType(name, kind) ||
+                        (name == "achievementId" && !int.TryParse(
+                            source.Substring(valueStart, position - valueStart),
+                            System.Globalization.NumberStyles.AllowLeadingSign,
+                            System.Globalization.CultureInfo.InvariantCulture, out _))))
+                        return false;
+                    WhiteSpace();
+                    if (Take('}')) return !achievement ||
+                        memberNames.Contains("achievementId");
+                } while (Take(','));
+                return false;
+            }
+
+            private bool AchievementArray(int depth)
+            {
+                if (depth > 32 || !Take('[')) return false;
+                WhiteSpace();
+                if (Take(']')) return true;
+                do
+                {
+                    WhiteSpace();
+                    if (!Object(false, depth + 1, true)) return false;
+                    WhiteSpace();
+                    if (Take(']')) return true;
+                } while (Take(','));
+                return false;
+            }
+
+            private bool Array(int depth)
+            {
+                if (depth > 32 || !Take('[')) return false;
+                WhiteSpace();
+                if (Take(']')) return true;
+                do
+                {
+                    WhiteSpace();
+                    if (!Value(depth + 1, out _)) return false;
+                    WhiteSpace();
+                    if (Take(']')) return true;
+                } while (Take(','));
+                return false;
+            }
+
+            private bool Value(int depth, out Kind kind)
+            {
+                kind = Kind.Null;
+                if (position >= source.Length || depth > 32) return false;
+                char c = source[position];
+                if (c == '{') { kind = Kind.Object; return Object(false, depth); }
+                if (c == '[') { kind = Kind.Array; return Array(depth); }
+                if (c == '"') { kind = Kind.String; return String(out _); }
+                if (c == 't' || c == 'f')
+                {
+                    kind = Kind.Boolean;
+                    return Literal(c == 't' ? "true" : "false");
+                }
+                if (c == 'n') return Literal("null");
+                return Number(out kind);
+            }
+
+            private bool Number(out Kind kind)
+            {
+                kind = Kind.Integer;
+                Take('-');
+                if (Take('0'))
+                {
+                    if (Digit()) return false;
+                }
+                else
+                {
+                    if (position >= source.Length || source[position] < '1' ||
+                        source[position] > '9') return false;
+                    do { position++; } while (Digit());
+                }
+                if (Take('.'))
+                {
+                    kind = Kind.Number;
+                    if (!Digit()) return false;
+                    do { position++; } while (Digit());
+                }
+                if (Take('e') || Take('E'))
+                {
+                    kind = Kind.Number;
+                    if (!Take('+')) Take('-');
+                    if (!Digit()) return false;
+                    do { position++; } while (Digit());
+                }
+                return true;
+            }
+
+            private bool String(out string value)
+            {
+                value = null;
+                if (!Take('"')) return false;
+                var decoded = new System.Text.StringBuilder();
+                while (position < source.Length)
+                {
+                    char c = source[position++];
+                    if (c == '"') { value = decoded.ToString(); return true; }
+                    if (c < 0x20) return false;
+                    if (c != '\\') { decoded.Append(c); continue; }
+                    if (position >= source.Length) return false;
+                    c = source[position++];
+                    if (c == 'u')
+                    {
+                        if (position + 4 > source.Length) return false;
+                        string hex = source.Substring(position, 4);
+                        if (!ushort.TryParse(hex, System.Globalization.NumberStyles.HexNumber,
+                            System.Globalization.CultureInfo.InvariantCulture, out ushort code))
+                            return false;
+                        decoded.Append((char)code);
+                        position += 4;
+                    }
+                    else if ("\"\\/".IndexOf(c) >= 0) decoded.Append(c);
+                    else if (c == 'b') decoded.Append('\b');
+                    else if (c == 'f') decoded.Append('\f');
+                    else if (c == 'n') decoded.Append('\n');
+                    else if (c == 'r') decoded.Append('\r');
+                    else if (c == 't') decoded.Append('\t');
+                    else return false;
+                }
+                return false;
+            }
+
+            private bool Literal(string text)
+            {
+                if (position + text.Length > source.Length ||
+                    string.CompareOrdinal(source, position, text, 0, text.Length) != 0)
+                    return false;
+                position += text.Length;
+                return true;
+            }
+
+            private bool Take(char c)
+            {
+                if (position >= source.Length || source[position] != c) return false;
+                position++;
+                return true;
+            }
+
+            private bool Digit() => position < source.Length &&
+                source[position] >= '0' && source[position] <= '9';
+
+            private void WhiteSpace()
+            {
+                while (position < source.Length &&
+                    (source[position] == ' ' || source[position] == '\t' ||
+                     source[position] == '\r' || source[position] == '\n'))
+                    position++;
+            }
+
+            private static bool ValidRootType(string name, Kind kind)
+            {
+                switch (name)
+                {
+                    case "duelsWon": case "duelsLost": case "duelsAbandoned":
+                    case "rematchesWon": case "rematchesLost":
+                    case "rematchesAbandoned": case "currentOpenWorldTheme":
+                        return kind == Kind.Integer;
+                    case "returnX": case "returnY": case "returnZ":
+                        return kind == Kind.Integer || kind == Kind.Number;
+                    case "achievements": return kind == Kind.Array;
+                    case "rivalMadridDefeated": case "rivalBarcelonaDefeated":
+                    case "rivalValenciaDefeated": case "rivalAndaluciaDefeated":
+                    case "andaluciaUnlocked": case "mainProgressionCompleted":
+                    case "rivalMadridPersonalityCompleted":
+                    case "rivalBarcelonaPersonalityCompleted":
+                    case "rivalValenciaPersonalityCompleted":
+                    case "rivalAndaluciaPersonalityCompleted":
+                        return kind == Kind.Boolean;
+                    default: return true;
+                }
+            }
+
+            private static bool IsIntegerField(string name)
+            {
+                switch (name)
+                {
+                    case "duelsWon": case "duelsLost": case "duelsAbandoned":
+                    case "rematchesWon": case "rematchesLost":
+                    case "rematchesAbandoned": case "currentOpenWorldTheme":
+                        return true;
+                    default: return false;
+                }
+            }
+
+            private static bool ValidAchievementType(string name, Kind kind)
+            {
+                switch (name)
+                {
+                    case "achievementId": return kind == Kind.Integer;
+                    case "unlocked": return kind == Kind.Boolean;
+                    case "unlockedDate": return kind == Kind.String || kind == Kind.Null;
+                    default: return true;
+                }
+            }
         }
 
         public static void DeleteSave()

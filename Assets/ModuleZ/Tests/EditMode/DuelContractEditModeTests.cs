@@ -49,7 +49,7 @@ namespace ModuleZ.Tests.EditMode
             finally
             {
                 if (priorSession != null)
-                    Restore(priorSession);
+                    RestoreSession(priorSession);
             }
         }
 
@@ -247,7 +247,7 @@ namespace ModuleZ.Tests.EditMode
                 paths.GetMethod("ClearRootOverride", BindingFlags.Public | BindingFlags.Static)
                     .Invoke(null, null);
                 Restore(gameState);
-                Restore(session);
+                RestoreSession(session);
             }
             Assert.That(paths.GetProperty("RootPath").GetValue(null), Is.EqualTo(originalRoot));
         }
@@ -421,6 +421,17 @@ namespace ModuleZ.Tests.EditMode
         {
             foreach (KeyValuePair<FieldInfo, object> entry in snapshot)
                 entry.Key.SetValue(null, entry.Value);
+        }
+
+        private static void RestoreSession(Dictionary<FieldInfo, object> snapshot)
+        {
+            Type sessionType = RequireType(SessionName);
+            if ((bool)snapshot[sessionType.GetField("HasActiveDuel")])
+                InvokeSession("StartDuel",
+                    snapshot[sessionType.GetField("RivalId")],
+                    snapshot[sessionType.GetField("IsRematch")],
+                    snapshot[sessionType.GetField("ReturnPosition")]);
+            else InvokeSession("Clear");
         }
 
         private static void InvokeSession(string name, params object[] args)

@@ -72,13 +72,21 @@ namespace ModuleZ.Tests.PlayMode
             yield return null;
             Time.timeScale = timeScaleBefore;
             Restore(gameBefore);
-            Restore(sessionBefore);
+            RestoreSession(sessionBefore);
             foreach (var entry in achievementsBefore)
             {
                 Type type = entry.Key.GetType();
                 type.GetField("unlocked").SetValue(entry.Key, entry.Value[0]);
                 type.GetField("unlockedDate").SetValue(entry.Key, entry.Value[1]);
             }
+            Type achievementState = RuntimeContractProbe.RequireType(
+                "ModuleZ.Core.Achievements.ModuleZAchievementState");
+            IList originalStates = (IList)Activator.CreateInstance(
+                typeof(List<>).MakeGenericType(achievementState));
+            foreach (object state in achievementsBefore.Keys)
+                originalStates.Add(state);
+            RuntimeContractProbe.InvokePublicStatic(
+                RuntimeContractProbe.RequireType(AchievementName), "LoadStates", originalStates);
             Assert.That(RuntimeContractProbe.FindSceneComponents(
                     "ModuleZ.Core.SaveSystem.ModuleZAutoSaveController"), Is.Empty,
                 "Boot autosaver survived test teardown; retain isolated root.");
@@ -259,6 +267,17 @@ namespace ModuleZ.Tests.PlayMode
         {
             foreach (var item in values)
                 item.Key.SetValue(null, item.Value);
+        }
+
+        private static void RestoreSession(Dictionary<FieldInfo, object> values)
+        {
+            Type type = RuntimeContractProbe.RequireType(SessionName);
+            if ((bool)values[type.GetField("HasActiveDuel")])
+                RuntimeContractProbe.InvokePublicStatic(type, "StartDuel",
+                    values[type.GetField("RivalId")],
+                    values[type.GetField("IsRematch")],
+                    values[type.GetField("ReturnPosition")]);
+            else RuntimeContractProbe.InvokePublicStatic(type, "Clear");
         }
 
         private static void AssertSame(Dictionary<FieldInfo, object> values)

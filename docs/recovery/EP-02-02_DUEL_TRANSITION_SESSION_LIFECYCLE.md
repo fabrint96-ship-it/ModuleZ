@@ -32,11 +32,20 @@ of the older filename or schema.
 
 The production Begin overload returns a distinct `Attempt`, capturing only the
 nine projected Legacy values and four session values. The session's read-only
-revision changes on `StartDuel` and `Clear`. Rollback requires both the same
-pending attempt and its published session revision and Legacy values. A stale
-callback cannot undo a successor; an external write makes rollback decline
-instead of overwriting newer state. A new Begin first cancels an owned pending
-attempt. Invalid contexts do not publish anything.
+revision changes on `StartDuel` and `Clear`. Rollback requires the same pending
+attempt and its published session revision. It restores each Legacy projection
+only while that field still carries the attempt's published value. A changed
+field is left to its external writer; the other eight cannot retain this
+attempt's provisional values. If any field changed externally, cancellation
+reports incomplete rollback and clears the attempt-owned session instead of
+re-publishing a previous active session against foreign Legacy state. A fully
+owned cancellation restores the previous session, including a previous active
+one. A stale callback cannot undo a successor. A new Begin first cancels an
+owned pending attempt. Invalid contexts do not publish anything.
+
+Legacy fields have no per-field revision. A same-value external write cannot
+be distinguished from the attempt's own value; compare-and-restore is the
+bounded ownership guarantee available without a new Legacy state authority.
 
 The interactable retains the attempt across its 1.5-second delay. A rejected
 completion releases `duelStarting`; disable/destroy cancels the delayed invoke
@@ -48,13 +57,22 @@ remains responsible for an active session on fatal Duel startup.
 
 ## Save loading and menu policy
 
-`TryLoadGame` reports `Success`, `NotFound`, `InvalidData`, or `ReadError`.
+`TryLoadGame` reports `Success`, `NotFound`, `InvalidData`, `ReadError`, or
+`ApplyError` (a validated save whose application fails).
 `LoadGame()` remains a void compatibility wrapper for SaveBootstrap. The shared
-reader parses and validates before applying GameState or achievement state.
-Malformed JSON, absent core counters, negative counts, non-finite return
-coordinates and undefined themes are rejected. Optional fields are not newly
-required. `GetSaveData()` uses the same safe reader for MainMenu presentation.
-No invalid file is rewritten or deleted.
+reader validates full JSON grammar, root-level required counters, known root
+field types and deserialized values before applying GameState or achievement
+state. Malformed JSON, nested-only core counters, incompatible types, integer
+overflow, negative counts, invalid achievement IDs, duplicate achievements,
+non-finite return coordinates and undefined themes are rejected. Unknown fields
+and absent optional fields remain compatible with the current save format.
+`GetSaveData()` uses the same safe reader for MainMenu presentation. No invalid
+file is rewritten or deleted. Before application, the loader snapshots affected
+GameState and achievement objects. If application or achievement notification
+throws, it restores those values and reports `ApplyError`; successful-load
+ordering and serialization remain unchanged. Side effects performed by an
+arbitrary external achievement subscriber cannot be rolled back by this local
+snapshot and are not claimed as protected state.
 
 New Game retains two-click confirmation. Its second click uses `TryDeleteSave`;
 only a successful delete resets GameState, clears DuelSession, and navigates.
@@ -66,9 +84,12 @@ compatibility wrapper; the separate Delete Save menu operation is unchanged.
 ## Test contracts and isolation
 
 EditMode `ApplicationStateTransitionEditModeTests` covers
-`STATE-TRANSITION-001..006` and save-load statuses, including a current-format
-save with optional fields omitted. It restores public GameState/session fields,
-achievement values and the persistence override in teardown. The existing
+`STATE-TRANSITION-001..006`, a previous active session, partial Legacy rollback,
+malformed/nested/mistyped saves, and an injected achievement notification
+failure during load. It restores public GameState, achievement object identity
+and values, the notification delegate, and the persistence override in teardown.
+Session restoration uses public `StartDuel`/`Clear`, keeping its revision
+monotonic so stale attempts cannot regain ownership. The existing
 EP-02-01 `Begin` test now selects its original overload explicitly and retains
 its nine-projection assertions.
 
@@ -76,7 +97,11 @@ PlayMode `ApplicationStateMenuTests` covers `STATE-NEW-001..003` and
 `STATE-CONTINUE-001..005` through Boot's real button actions. It requires the
 wrapper's process-level isolated persistence marker before loading Boot, uses
 one unique per-test root beneath that process root, and tears down its Boot
-runtime. The wrapper's external post-exit real-profile fingerprint guard remains
+runtime. The EditMode fixture refuses a root overlapping the real profile or
+resolving through a reparse-point ancestor; its cleanup targets only its unique
+temporary directory. Both fixtures restore sessions through the public API and
+achievement entries through `LoadStates`. The wrapper's external post-exit
+real-profile fingerprint guard remains
 the final safety check. These tests have **not** been run in this slice.
 
 ## Validation and known limits

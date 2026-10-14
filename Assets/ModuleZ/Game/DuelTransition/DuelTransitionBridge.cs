@@ -60,19 +60,6 @@ namespace ModuleZ.Game.DuelTransition
                 };
             }
 
-            internal void Restore()
-            {
-                ModuleZGameState.PendingDuelRival = PendingRival;
-                ModuleZGameState.CurrentDuelRival = CurrentRival;
-                ModuleZGameState.CurrentDuelIsRematch = IsRematch;
-                ModuleZGameState.OpenWorldReturnPosition = ReturnPosition;
-                ModuleZGameState.ReturningFromDuel = Returning;
-                ModuleZGameState.DuelCompleted = Completed;
-                ModuleZGameState.DuelWasCancelled = Cancelled;
-                ModuleZGameState.DuelWasLost = Lost;
-                ModuleZGameState.DuelWasAbandoned = Abandoned;
-            }
-
             internal bool EqualsPublished(DuelContext context)
             {
                 return ModuleZGameState.PendingDuelRival == context.RivalId &&
@@ -84,6 +71,41 @@ namespace ModuleZ.Game.DuelTransition
                     !ModuleZGameState.DuelWasCancelled &&
                     !ModuleZGameState.DuelWasLost &&
                     !ModuleZGameState.DuelWasAbandoned;
+            }
+
+            // Release only projections still carrying this attempt's value.
+            // A different value belongs to another writer and is never replaced.
+            internal bool RestoreOwned(DuelContext context)
+            {
+                bool complete = true;
+                if (ModuleZGameState.PendingDuelRival == context.RivalId)
+                    ModuleZGameState.PendingDuelRival = PendingRival;
+                else complete = false;
+                if (ModuleZGameState.CurrentDuelRival == context.RivalId)
+                    ModuleZGameState.CurrentDuelRival = CurrentRival;
+                else complete = false;
+                if (ModuleZGameState.CurrentDuelIsRematch == context.IsRematch)
+                    ModuleZGameState.CurrentDuelIsRematch = IsRematch;
+                else complete = false;
+                if (ModuleZGameState.OpenWorldReturnPosition == context.ReturnPosition)
+                    ModuleZGameState.OpenWorldReturnPosition = ReturnPosition;
+                else complete = false;
+                if (ModuleZGameState.ReturningFromDuel)
+                    ModuleZGameState.ReturningFromDuel = Returning;
+                else complete = false;
+                if (!ModuleZGameState.DuelCompleted)
+                    ModuleZGameState.DuelCompleted = Completed;
+                else complete = false;
+                if (!ModuleZGameState.DuelWasCancelled)
+                    ModuleZGameState.DuelWasCancelled = Cancelled;
+                else complete = false;
+                if (!ModuleZGameState.DuelWasLost)
+                    ModuleZGameState.DuelWasLost = Lost;
+                else complete = false;
+                if (!ModuleZGameState.DuelWasAbandoned)
+                    ModuleZGameState.DuelWasAbandoned = Abandoned;
+                else complete = false;
+                return complete;
             }
         }
 
@@ -136,19 +158,15 @@ namespace ModuleZ.Game.DuelTransition
                 return false;
             }
 
-            if (!attempt.Previous.EqualsPublished(attempt.Context))
-            {
-                // The session is still ours, but another writer owns at least
-                // one Legacy field. Retire our session without touching theirs.
+            bool fullyOwned = attempt.Previous.RestoreOwned(attempt.Context);
+            // A foreign Legacy projection makes a former active session
+            // ambiguous. Do not re-publish it against that foreign value.
+            if (fullyOwned)
                 RestoreSession(attempt);
-                pendingAttempt = null;
-                return false;
-            }
-
-            attempt.Previous.Restore();
-            RestoreSession(attempt);
+            else
+                ModuleZDuelSessionState.Clear();
             pendingAttempt = null;
-            return true;
+            return fullyOwned;
         }
 
         private static void RestoreSession(Attempt attempt)
