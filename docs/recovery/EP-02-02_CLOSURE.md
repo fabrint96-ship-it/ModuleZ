@@ -60,3 +60,15 @@ CLEAN-01 figura **completado y verificado por el Project Owner**. En la comproba
 ## Disposición propuesta, no ejecutada
 
 La implementación, revisión, integración y validación aislada de EP-02-02 tienen evidencia registrada. Se propone al Project Owner decidir el cierre **solo después** de revisar este PR documental y aceptar expresamente las limitaciones y obligaciones anteriores. Hasta esa decisión, el estado es **CLOSURE PROPOSAL PENDING OWNER AUTHORIZATION — EP-02-02 CLOSE NOT AUTHORIZED**. Este PR no realiza el cierre, no publica una release y no autoriza su propio merge.
+
+## Final Owner Authorization — CLOSE-03
+
+El **2026-10-14**, el Project Owner autorizó expresamente el cierre de **EP-02-02 — Duel Transition Rollback & Session Lifecycle**, limitado a los contratos y validaciones descritos arriba. La autorización se emitió sobre `develop @ 3c399e55978a6499d20c4e76680e2cd31cdc5b33` (merge de [PR #37](https://github.com/fabrint96-ship-it/ModuleZ/pull/37)). [PR #35](https://github.com/fabrint96-ship-it/ModuleZ/pull/35) contiene la implementación; [PR #36](https://github.com/fabrint96-ship-it/ModuleZ/pull/36), el registro de integración y validación; PR #37, la propuesta documental previa. **CLOSE-01: limpieza completada**, según la decisión del Project Owner. **CLOSE-03: autorización expresa de cierre**.
+
+**Estado definitivo del episodio: CLOSED — SCOPE LIMITED.** Las referencias anteriores a `CLOSE NOT AUTHORIZED` y a una propuesta pendiente reflejan estados históricos **anteriores** a CLOSE-03; no describen el estado vigente. Esta decisión no amplía el alcance funcional, no reinterpreta los resultados ni resuelve las obligaciones abiertas:
+
+- **REC-008:** PARTIALLY MIGRATED / STABILIZED; no se ha completado la migración de Application State.
+- **REC-007:** IN PROGRESS. **F1.6** y **EP-01:** OPEN; sus criterios de cierre no cambian.
+- **Smoke:** NOT RUN. **Independent Unity CI:** BLOCKED. Ninguno se convierte en PASS por este cierre limitado.
+
+La autorización de cierre del episodio no constituye autorización para fusionar este PR documental: su revisión independiente y merge siguen reservados al Project Owner.
