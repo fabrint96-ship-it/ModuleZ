@@ -486,8 +486,14 @@ namespace ModuleZ.UI.MainMenu
 
             waitingNewGameConfirmation = false;
 
-            ModuleZSaveManager.DeleteSave();
+            if (!ModuleZSaveManager.TryDeleteSave())
+            {
+                if (infoText != null)
+                    infoText.text = "No se pudo borrar la partida. Inténtalo de nuevo.";
+                return;
+            }
             ModuleZ.Core.Managers.ModuleZGameState.ResetGameState();
+            ModuleZDuelSessionState.Clear();
 
             menuVisible = false;
 
@@ -505,17 +511,17 @@ namespace ModuleZ.UI.MainMenu
         {
             CancelPendingConfirmations();
 
-            if (!ModuleZSaveManager.HasSave())
+            ModuleZLoadGameStatus loadStatus = ModuleZSaveManager.TryLoadGame();
+            if (loadStatus != ModuleZLoadGameStatus.Success)
             {
-                Debug.Log("[Module Z] No hay partida guardada.");
-
                 if (infoText != null)
-                    infoText.text = "No hay partida guardada.";
-
+                    infoText.text = loadStatus == ModuleZLoadGameStatus.NotFound
+                        ? "No hay partida guardada."
+                        : "No se pudo cargar la partida guardada.";
                 return;
             }
 
-            ModuleZSaveManager.LoadGame();
+            ModuleZDuelSessionState.Clear();
 
             menuVisible = false;
 

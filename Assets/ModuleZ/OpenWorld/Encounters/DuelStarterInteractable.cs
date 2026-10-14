@@ -15,8 +15,7 @@ namespace ModuleZ.OpenWorld.Encounters
         public ModuleZRivalId rivalId = ModuleZRivalId.Madrid;
 
         private bool duelStarting;
-        private DuelContext pendingDuelContext;
-        private bool hasPendingDuelContext;
+        private DuelTransitionBridge.Attempt pendingAttempt;
 
         private void Awake()
         {
@@ -63,14 +62,15 @@ namespace ModuleZ.OpenWorld.Encounters
             Vector3 returnPosition =
                 transform.position + new Vector3(0f, 0f, -3f);
 
-            pendingDuelContext = new DuelContext(
+            DuelContext context = new DuelContext(
                 rivalId,
                 isRematch,
                 returnPosition
             );
 
             if (!DuelTransitionBridge.Begin(
-                    pendingDuelContext,
+                    context,
+                    out pendingAttempt,
                     out string failureReason))
             {
                 duelStarting = false;
@@ -80,8 +80,6 @@ namespace ModuleZ.OpenWorld.Encounters
                 );
                 return;
             }
-
-            hasPendingDuelContext = true;
 
             Invoke(nameof(StartDuel), 1.5f);
 
@@ -114,13 +112,40 @@ namespace ModuleZ.OpenWorld.Encounters
 
         private void StartDuel()
         {
-            if (!hasPendingDuelContext)
+            if (pendingAttempt == null)
             {
+                duelStarting = false;
                 Debug.LogError("[ModuleZ] No existe DuelContext pendiente.");
                 return;
             }
 
-            DuelTransitionBridge.CompleteAfterDelay(pendingDuelContext);
+            DuelTransitionBridge.Attempt attempt = pendingAttempt;
+            if (!DuelTransitionBridge.CompleteAfterDelay(
+                    attempt, out string failureReason))
+            {
+                pendingAttempt = null;
+                duelStarting = false;
+                Debug.LogError("[ModuleZ] No se pudo cargar el duelo: " + failureReason);
+            }
+        }
+
+        private void OnDisable()
+        {
+            CancelPendingTransition();
+        }
+
+        private void OnDestroy()
+        {
+            CancelPendingTransition();
+        }
+
+        private void CancelPendingTransition()
+        {
+            CancelInvoke(nameof(StartDuel));
+            if (pendingAttempt != null)
+                DuelTransitionBridge.Cancel(pendingAttempt);
+            pendingAttempt = null;
+            duelStarting = false;
         }
 
         private string GetChallengeMessage()

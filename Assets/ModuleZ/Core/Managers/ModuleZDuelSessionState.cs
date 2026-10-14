@@ -9,6 +9,9 @@ namespace ModuleZ.Core.Managers
         public static ModuleZRivalId RivalId;
         public static bool IsRematch;
         public static Vector3 ReturnPosition;
+        // Changes whenever session ownership changes, including a repeated
+        // payload. A delayed transition may only undo its own publication.
+        public static ulong Revision { get; private set; }
 
         public static void StartDuel(
             ModuleZRivalId rivalId,
@@ -19,6 +22,7 @@ namespace ModuleZ.Core.Managers
             IsRematch = isRematch;
             ReturnPosition = returnPosition;
             HasActiveDuel = true;
+            Revision++;
         }
 
         public static void Clear()
@@ -27,6 +31,7 @@ namespace ModuleZ.Core.Managers
             RivalId = default;
             IsRematch = false;
             ReturnPosition = Vector3.zero;
+            Revision++;
         }
     }
 }
