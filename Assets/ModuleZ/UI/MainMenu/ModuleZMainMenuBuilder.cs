@@ -494,6 +494,12 @@ namespace ModuleZ.UI.MainMenu
             }
             ModuleZ.Core.Managers.ModuleZGameState.ResetGameState();
             ModuleZDuelSessionState.Clear();
+            if (!ModuleZSaveManager.ConfirmFreshStart())
+            {
+                if (infoText != null)
+                    infoText.text = "No se pudo estabilizar la nueva partida.";
+                return;
+            }
 
             menuVisible = false;
 
@@ -535,7 +541,20 @@ namespace ModuleZ.UI.MainMenu
 
             if (!ModuleZSaveManager.HasSave())
             {
+                if (!ModuleZSaveManager.TryDeleteSave())
+                {
+                    if (infoText != null)
+                        infoText.text = "No se pudo limpiar la partida.";
+                    return;
+                }
                 ModuleZ.Core.Managers.ModuleZGameState.ResetGameState();
+                ModuleZDuelSessionState.Clear();
+                if (!ModuleZSaveManager.ConfirmFreshStart())
+                {
+                    if (infoText != null)
+                        infoText.text = "No se pudo estabilizar el estado.";
+                    return;
+                }
 
                 if (infoText != null)
                     infoText.text = "No hay partida para borrar.";
@@ -555,8 +574,20 @@ namespace ModuleZ.UI.MainMenu
 
             waitingDeleteConfirmation = false;
 
-            ModuleZSaveManager.DeleteSave();
+            if (!ModuleZSaveManager.TryDeleteSave())
+            {
+                if (infoText != null)
+                    infoText.text = "No se pudo borrar la partida. Inténtalo de nuevo.";
+                return;
+            }
             ModuleZ.Core.Managers.ModuleZGameState.ResetGameState();
+            ModuleZDuelSessionState.Clear();
+            if (!ModuleZSaveManager.ConfirmFreshStart())
+            {
+                if (infoText != null)
+                    infoText.text = "No se pudo estabilizar el estado tras borrar.";
+                return;
+            }
 
             if (infoText != null)
                 infoText.text = "Partida guardada eliminada.";

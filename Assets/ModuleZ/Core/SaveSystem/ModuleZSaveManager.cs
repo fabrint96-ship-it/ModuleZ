@@ -3,7 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.Achievements;
+using ModuleZ.Core.SceneLoading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ModuleZ.Core.SaveSystem
 {
@@ -24,7 +26,8 @@ namespace ModuleZ.Core.SaveSystem
         TemporaryWriteError,
         ExistingSaveInvalid,
         PublicationError,
-        UnsupportedPlatform
+        UnsupportedPlatform,
+        LifecycleRejected
     }
 
     public static class ModuleZSaveManager
@@ -32,6 +35,54 @@ namespace ModuleZ.Core.SaveSystem
         private const string SaveFileName = "modulez_save.json";
         private const string PendingSuffix = ".pending";
         private const string BackupSuffix = ".bak";
+        // A save gate, not another owner of game/session state. The bridge
+        // alone owns the token and must release exactly its own publication.
+        private static object provisionalTransitionOwner;
+        private static bool loading;
+        private static bool uncertainTransitionState;
+        private static bool uncertainLoadState;
+        private static ulong appliedResultRevision;
+        private static bool hasAppliedResultRevision;
+
+        internal static void ConfirmAppliedDuelResult(ulong sessionRevision)
+        {
+            if (ModuleZDuelSessionState.Revision == sessionRevision)
+            {
+                appliedResultRevision = sessionRevision;
+                hasAppliedResultRevision = true;
+            }
+        }
+
+        internal static bool BeginProvisionalTransition(object owner)
+        {
+            if (owner == null || provisionalTransitionOwner != null ||
+                uncertainTransitionState)
+                return false;
+            provisionalTransitionOwner = owner;
+            return true;
+        }
+
+        internal static void EndProvisionalTransition(object owner, bool stable)
+        {
+            if (!ReferenceEquals(provisionalTransitionOwner, owner))
+                return;
+            provisionalTransitionOwner = null;
+            if (!stable)
+                uncertainTransitionState = true;
+        }
+
+        // Called only after the menu has deleted the save, reset GameState and
+        // cleared the transient session. Deletion alone is not a state reset.
+        internal static bool ConfirmFreshStart()
+        {
+            if (loading || provisionalTransitionOwner != null ||
+                ModuleZDuelSessionState.HasActiveDuel)
+                return false;
+            uncertainTransitionState = false;
+            uncertainLoadState = false;
+            hasAppliedResultRevision = false;
+            return true;
+        }
 
         private static string SavePath
         {
@@ -56,6 +107,15 @@ namespace ModuleZ.Core.SaveSystem
 
         public static ModuleZSaveGameStatus TrySaveGame()
         {
+            if (loading || provisionalTransitionOwner != null ||
+                uncertainTransitionState || uncertainLoadState ||
+                ((ModuleZDuelSessionState.HasActiveDuel ||
+                  (Application.isPlaying && SceneManager.GetActiveScene().name ==
+                   ModuleZSceneController.DuelScene)) &&
+                 (!hasAppliedResultRevision ||
+                  appliedResultRevision != ModuleZDuelSessionState.Revision)))
+                return ModuleZSaveGameStatus.LifecycleRejected;
+
             ModuleZSaveData data;
             try
             {
@@ -209,6 +269,33 @@ namespace ModuleZ.Core.SaveSystem
 
         public static ModuleZLoadGameStatus TryLoadGame()
         {
+            if (loading || provisionalTransitionOwner != null)
+                return ModuleZLoadGameStatus.ApplyError;
+            loading = true;
+            try
+            {
+                ModuleZLoadGameStatus status = TryLoadGameCore();
+                if (status == ModuleZLoadGameStatus.Success)
+                    uncertainLoadState = false;
+                else if (status != ModuleZLoadGameStatus.NotFound)
+                    uncertainLoadState = true;
+                return status;
+            }
+            catch (Exception exception)
+            {
+                uncertainLoadState = true;
+                Debug.LogWarning("[ModuleZ] Carga interrumpida; guardado bloqueado: " +
+                    exception.Message);
+                return ModuleZLoadGameStatus.ApplyError;
+            }
+            finally
+            {
+                loading = false;
+            }
+        }
+
+        private static ModuleZLoadGameStatus TryLoadGameCore()
+        {
             ModuleZLoadGameStatus status = TryReadSaveData(out ModuleZSaveData data);
             if (status != ModuleZLoadGameStatus.Success)
                 return status;
@@ -227,6 +314,8 @@ namespace ModuleZ.Core.SaveSystem
             try
             {
                 ApplyLoadedData(data);
+                uncertainTransitionState = false;
+                hasAppliedResultRevision = false;
                 Debug.Log("[ModuleZ] Partida cargada.");
                 return ModuleZLoadGameStatus.Success;
             }
@@ -747,6 +836,8 @@ namespace ModuleZ.Core.SaveSystem
 
         public static bool TryDeleteSave()
         {
+            if (loading || provisionalTransitionOwner != null)
+                return false;
             try
             {
                 // File.Delete is a no-op for a missing file, but unlike a

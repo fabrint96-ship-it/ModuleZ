@@ -31,6 +31,7 @@ namespace ModuleZ.Tests.EditMode
         private Type achievementManager;
         private FieldInfo unlockHandler;
         private object priorUnlockHandler;
+        private object reentrantSaveStatus;
 
         [SetUp]
         public void SetUp()
@@ -63,7 +64,11 @@ namespace ModuleZ.Tests.EditMode
                 "ModuleZ-EP02-02-" + Guid.NewGuid().ToString("N"));
             AssertSafeIsolatedRoot();
             paths.GetMethod("SetRootOverride").Invoke(null, new object[] { isolatedRoot });
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
             session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
         }
 
         [TearDown]
@@ -74,6 +79,11 @@ namespace ModuleZ.Tests.EditMode
                 foreach (object token in attempts)
                     Cancel(token);
                 attempts.Clear();
+                Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                    .Invoke(null, null), Is.True);
+                gameState.GetMethod("ResetGameState").Invoke(null, null);
+                session.GetMethod("Clear").Invoke(null, null);
+                ConfirmFreshStart();
                 Restore(priorGame);
                 RestoreSession(priorSession);
                 foreach (var entry in priorAchievements)
@@ -203,6 +213,82 @@ namespace ModuleZ.Tests.EditMode
             Assert.That(Cancel(token), Is.True);
             Assert.That(Cancel(token), Is.False);
             Assert.That(Complete(token)[0], Is.False);
+        }
+
+        [Test]
+        public void LIFE_001_002_StableSaveSucceedsAndPendingTransitionRejectsBeforeCapture()
+        {
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+            Assert.That(File.Exists(SavePath()), Is.True);
+            object token = Begin(1)[1];
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.False);
+            Assert.That(File.Exists(SavePath()), Is.True);
+            Assert.That(Cancel(token), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_003_ObsoleteTransitionCannotUnlockUncertainProjection()
+        {
+            object token = Begin(1)[1];
+            session.GetMethod("Clear").Invoke(null, null);
+            Assert.That(Cancel(token), Is.False);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
+            session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_004_FailedLoadBlocksSaveUntilExplicitRecovery()
+        {
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(), "{malformed");
+            LogAssert.Expect(LogType.Warning, new Regex("SaveData inválido"));
+            Assert.That(Load().ToString(), Is.EqualTo("InvalidData"));
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
+            session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_002_ReentrantSaveDuringLoadIsRejectedBeforeCapture()
+        {
+            achievementManager.GetMethod("ResetAll").Invoke(null, null);
+            Type idType = Require("ModuleZ.Core.Achievements.ModuleZAchievementId");
+            MethodInfo capture = GetType().GetMethod(nameof(CaptureReentrantSave),
+                BindingFlags.Public | BindingFlags.Instance).MakeGenericMethod(idType);
+            unlockHandler.SetValue(null, Delegate.CreateDelegate(
+                unlockHandler.FieldType, this, capture));
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(),
+                "{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0}");
+            Assert.That(Load().ToString(), Is.EqualTo("Success"));
+            Assert.That(reentrantSaveStatus?.ToString(), Is.EqualTo("LifecycleRejected"));
+        }
+
+        public void CaptureReentrantSave<T>(T id)
+        {
+            reentrantSaveStatus = Save();
+        }
+
+        [Test]
+        public void LIFE_005_LegacyCompletedFlagAloneCannotAuthorizeActiveSession()
+        {
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 1), false, (object)Vector3.one });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            gameState.GetField("DuelCompleted").SetValue(null, true);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
         }
 
         [Test]
@@ -418,6 +504,17 @@ namespace ModuleZ.Tests.EditMode
 
         private object Load() => saveManager.GetMethod("TryLoadGame", PublicStatic)
             .Invoke(null, null);
+
+        private object Save() => saveManager.GetMethod("TrySaveGame", PublicStatic)
+            .Invoke(null, null);
+
+        private void ConfirmFreshStart()
+        {
+            MethodInfo confirm = saveManager.GetMethod("ConfirmFreshStart",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(confirm, Is.Not.Null);
+            Assert.That(confirm.Invoke(null, null), Is.EqualTo(true));
+        }
 
         private string SavePath() => Path.Combine(isolatedRoot, "modulez_save.json");
 

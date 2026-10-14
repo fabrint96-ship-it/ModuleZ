@@ -1,6 +1,7 @@
 using System;
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.SceneLoading;
+using ModuleZ.Core.SaveSystem;
 using ModuleZ.OpenWorld.Encounters;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -115,11 +116,9 @@ namespace ModuleZ.Game.DuelTransition
         // cannot later request a rollback. Production uses the overload below.
         public static bool Begin(DuelContext context, out string failureReason)
         {
-            if (!IsValid(context, out failureReason))
-                return false;
-
-            Publish(context);
-            return true;
+            // Retain the compatibility signature, but never publish an
+            // unguarded provisional projection.
+            return Begin(context, out Attempt _, out failureReason);
         }
 
         public static bool Begin(
@@ -138,7 +137,22 @@ namespace ModuleZ.Game.DuelTransition
             }
 
             attempt = new Attempt(context);
-            Publish(context);
+            if (!ModuleZSaveManager.BeginProvisionalTransition(attempt))
+            {
+                attempt = null;
+                failureReason = "Save lifecycle is not stable for a duel transition.";
+                return false;
+            }
+            try
+            {
+                Publish(context);
+            }
+            catch
+            {
+                ModuleZSaveManager.EndProvisionalTransition(attempt, false);
+                pendingAttempt = null;
+                throw;
+            }
             attempt.PublishedRevision = ModuleZDuelSessionState.Revision;
             pendingAttempt = attempt;
             return true;
@@ -155,6 +169,7 @@ namespace ModuleZ.Game.DuelTransition
             if (ModuleZDuelSessionState.Revision != attempt.PublishedRevision)
             {
                 pendingAttempt = null;
+                ModuleZSaveManager.EndProvisionalTransition(attempt, false);
                 return false;
             }
 
@@ -166,6 +181,7 @@ namespace ModuleZ.Game.DuelTransition
             else
                 ModuleZDuelSessionState.Clear();
             pendingAttempt = null;
+            ModuleZSaveManager.EndProvisionalTransition(attempt, fullyOwned);
             return fullyOwned;
         }
 
@@ -215,6 +231,7 @@ namespace ModuleZ.Game.DuelTransition
             try
             {
                 ModuleZSceneController.Instance.LoadDuel();
+                ModuleZSaveManager.EndProvisionalTransition(attempt, true);
                 failureReason = null;
                 return true;
             }
@@ -229,6 +246,8 @@ namespace ModuleZ.Game.DuelTransition
                     if (Cancel(attempt))
                         ModuleZGameState.IsPaused = wasPaused;
                 }
+                else
+                    ModuleZSaveManager.EndProvisionalTransition(attempt, false);
                 return false;
             }
         }

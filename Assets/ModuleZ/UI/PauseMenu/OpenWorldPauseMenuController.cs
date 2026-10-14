@@ -174,10 +174,12 @@ namespace ModuleZ.UI.PauseMenu
 
         private void OnSaveClicked()
         {
-            ModuleZSaveManager.SaveGame();
+            ModuleZSaveGameStatus status = ModuleZSaveManager.TrySaveGame();
 
             if (pauseInfoText != null)
-                pauseInfoText.text = "Partida guardada.";
+                pauseInfoText.text = status == ModuleZSaveGameStatus.Success
+                    ? "Partida guardada."
+                    : "No se pudo guardar: " + status;
 
             StartCoroutine(ClearPauseInfoText());
         }
@@ -204,7 +206,13 @@ namespace ModuleZ.UI.PauseMenu
 
         private void OnSaveAndExitClicked()
         {
-            ModuleZSaveManager.SaveGame();
+            ModuleZSaveGameStatus status = ModuleZSaveManager.TrySaveGame();
+            if (status != ModuleZSaveGameStatus.Success)
+            {
+                if (pauseInfoText != null)
+                    pauseInfoText.text = "No se pudo guardar: " + status;
+                return;
+            }
 
             if (pauseInfoText != null)
                 pauseInfoText.text = "Partida guardada. Volviendo al menú...";
