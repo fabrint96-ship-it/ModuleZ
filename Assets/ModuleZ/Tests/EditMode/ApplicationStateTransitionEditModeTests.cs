@@ -267,6 +267,14 @@ namespace ModuleZ.Tests.EditMode
         [TestCase("{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0,\"rivalMadridDefeated\":1}")]
         [TestCase("{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0,\"achievements\":[{\"achievementId\":\"1\"}]}")]
         [TestCase("{\"duelsWon\":2147483648,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":-2147483649,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":01,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":+1,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":1.,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":1e0,\"duelsLost\":0,\"duelsAbandoned\":0}")]
+        [TestCase("{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0,\"returnX\":1e+}")]
+        [TestCase("{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0,\"returnX\":NaN}")]
+        [TestCase("{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0,\"returnX\":\"1.25\"}")]
         public void STATE_LOAD_STATUS_004_BadRootOrTypesCannotApply(string json)
         {
             var before = Snapshot(gameState);
@@ -276,6 +284,82 @@ namespace ModuleZ.Tests.EditMode
             Assert.That(Load().ToString(), Is.EqualTo("InvalidData"));
             AssertUnchanged(before);
             AssertAchievementsUnchanged(achievementsBefore);
+        }
+
+        [TestCase("0", "0", "0", 0, 0, 0)]
+        [TestCase("2147483647", "0", "0", int.MaxValue, 0, 0)]
+        [TestCase("0", "2147483647", "0", 0, int.MaxValue, 0)]
+        [TestCase("0", "0", "2147483647", 0, 0, int.MaxValue)]
+        public void STATE_LOAD_STATUS_004B_IntegerBoundariesReadWithoutApplying(
+            string won, string lost, string abandoned, int expectedWon,
+            int expectedLost, int expectedAbandoned)
+        {
+            var before = Snapshot(gameState);
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(),
+                "{\"duelsWon\":" + won + ",\"duelsLost\":" + lost +
+                ",\"duelsAbandoned\":" + abandoned + "}");
+            object data = saveManager.GetMethod("GetSaveData", PublicStatic)
+                .Invoke(null, null);
+            Assert.That(data, Is.Not.Null);
+            Assert.That(data.GetType().GetField("duelsWon").GetValue(data),
+                Is.EqualTo(expectedWon));
+            Assert.That(data.GetType().GetField("duelsLost").GetValue(data),
+                Is.EqualTo(expectedLost));
+            Assert.That(data.GetType().GetField("duelsAbandoned").GetValue(data),
+                Is.EqualTo(expectedAbandoned));
+            AssertUnchanged(before);
+        }
+
+        [TestCase("0", "-0", "0.0", 0f, 0f, 0f)]
+        [TestCase("-12.5", "1.25e2", "3E-2", -12.5f, 125f, 0.03f)]
+        [TestCase("1e30", "-1e30", "0.125", 1e30f, -1e30f, 0.125f)]
+        public void STATE_LOAD_STATUS_004C_ValidCoordinateNumbersRead(
+            string x, string y, string z, float expectedX, float expectedY,
+            float expectedZ)
+        {
+            var before = Snapshot(gameState);
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(),
+                "{\"duelsWon\":0,\"duelsLost\":0,\"duelsAbandoned\":0," +
+                "\"returnX\":" + x + ",\"returnY\":" + y +
+                ",\"returnZ\":" + z + "}");
+            object data = saveManager.GetMethod("GetSaveData", PublicStatic)
+                .Invoke(null, null);
+            Assert.That(data, Is.Not.Null);
+            Assert.That((float)data.GetType().GetField("returnX").GetValue(data),
+                Is.EqualTo(expectedX).Within(Mathf.Max(0.0001f,
+                    Mathf.Abs(expectedX) * 0.00001f)));
+            Assert.That((float)data.GetType().GetField("returnY").GetValue(data),
+                Is.EqualTo(expectedY).Within(Mathf.Max(0.0001f,
+                    Mathf.Abs(expectedY) * 0.00001f)));
+            Assert.That((float)data.GetType().GetField("returnZ").GetValue(data),
+                Is.EqualTo(expectedZ).Within(Mathf.Max(0.0001f,
+                    Mathf.Abs(expectedZ) * 0.00001f)));
+            AssertUnchanged(before);
+        }
+
+        [Test]
+        public void STATE_LOAD_STATUS_004D_SaveGameOutputIsReadableAndLoadable()
+        {
+            AssertSafeIsolatedRoot();
+            Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                Is.EqualTo(isolatedRoot));
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
+            gameState.GetField("DuelsWon").SetValue(null, 2);
+            gameState.GetField("OpenWorldReturnPosition").SetValue(null,
+                new Vector3(-12.5f, 0.125f, 125f));
+            unlockHandler.SetValue(null, null);
+
+            saveManager.GetMethod("SaveGame", PublicStatic).Invoke(null, null);
+            Assert.That(File.Exists(SavePath()), Is.True);
+            Assert.That(new FileInfo(SavePath()).Length, Is.GreaterThan(0));
+            Assert.That(saveManager.GetMethod("GetSaveData", PublicStatic)
+                .Invoke(null, null), Is.Not.Null);
+            Assert.That(Load().ToString(), Is.EqualTo("Success"));
+            Assert.That(gameState.GetField("DuelsWon").GetValue(null), Is.EqualTo(2));
+            Assert.That(gameState.GetField("OpenWorldReturnPosition").GetValue(null),
+                Is.EqualTo(new Vector3(-12.5f, 0.125f, 125f)));
         }
 
         [Test]
