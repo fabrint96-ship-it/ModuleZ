@@ -16,9 +16,22 @@ namespace ModuleZ.Core.SaveSystem
         ApplyError
     }
 
+    public enum ModuleZSaveGameStatus
+    {
+        Success,
+        CaptureError,
+        SerializationError,
+        TemporaryWriteError,
+        ExistingSaveInvalid,
+        PublicationError,
+        UnsupportedPlatform
+    }
+
     public static class ModuleZSaveManager
     {
         private const string SaveFileName = "modulez_save.json";
+        private const string PendingSuffix = ".pending";
+        private const string BackupSuffix = ".bak";
 
         private static string SavePath
         {
@@ -31,7 +44,124 @@ namespace ModuleZ.Core.SaveSystem
             }
         }
 
+        private static string PendingPath => SavePath + PendingSuffix;
+        private static string BackupPath => SavePath + BackupSuffix;
+
         public static void SaveGame()
+        {
+            ModuleZSaveGameStatus status = TrySaveGame();
+            if (status != ModuleZSaveGameStatus.Success)
+                Debug.LogWarning("[ModuleZ] No se pudo guardar la partida: " + status);
+        }
+
+        public static ModuleZSaveGameStatus TrySaveGame()
+        {
+            ModuleZSaveData data;
+            try
+            {
+                data = CaptureSaveData();
+            }
+            catch (Exception)
+            {
+                return ModuleZSaveGameStatus.CaptureError;
+            }
+
+            string json;
+            try
+            {
+                json = JsonUtility.ToJson(data, true);
+                if (!SaveJsonShape.IsValid(json) || !IsValid(data))
+                    return ModuleZSaveGameStatus.SerializationError;
+            }
+            catch (Exception)
+            {
+                return ModuleZSaveGameStatus.SerializationError;
+            }
+
+            string pending = PendingPath;
+            bool ownsPending = false;
+            try
+            {
+                Directory.CreateDirectory(ModuleZPersistencePaths.RootPath);
+                // CreateNew never truncates a pending file left by another
+                // attempt or process. An unconfirmed pending file is not a save.
+                using (FileStream stream = new FileStream(
+                    pending, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    ownsPending = true;
+                    using (StreamWriter writer = new StreamWriter(stream))
+                    {
+                        writer.Write(json);
+                        writer.Flush();
+                        stream.Flush(true);
+                    }
+                }
+
+                if (TryReadSaveDataAt(pending, out ModuleZSaveData verified) !=
+                        ModuleZLoadGameStatus.Success || verified == null)
+                {
+                    DeleteOwnedPending(pending);
+                    return ModuleZSaveGameStatus.TemporaryWriteError;
+                }
+            }
+            catch (Exception)
+            {
+                if (ownsPending)
+                    DeleteOwnedPending(pending);
+                return ModuleZSaveGameStatus.TemporaryWriteError;
+            }
+
+            try
+            {
+                ModuleZLoadGameStatus existing =
+                    TryReadSaveDataAt(SavePath, out _);
+                if (existing == ModuleZLoadGameStatus.NotFound)
+                {
+                    // An orphaned backup may be the only recoverable copy.
+                    // Never publish over that ambiguous state automatically.
+                    if (File.Exists(BackupPath) || Directory.Exists(BackupPath))
+                        return ModuleZSaveGameStatus.ExistingSaveInvalid;
+                    // First creation has no previous save to replace. Move
+                    // fails if another writer created the destination.
+                    File.Move(pending, SavePath);
+                }
+                else if (existing == ModuleZLoadGameStatus.Success)
+                {
+                    // Both files share a directory/volume. Do not substitute
+                    // copy/delete or overwrite-move when Replace is unsupported.
+                    File.Replace(pending, SavePath, BackupPath);
+                }
+                else
+                {
+                    // A corrupt or unreadable main must not overwrite a
+                    // potentially sole valid recovery copy.
+                    return ModuleZSaveGameStatus.ExistingSaveInvalid;
+                }
+            }
+            catch (PlatformNotSupportedException)
+            {
+                return ModuleZSaveGameStatus.UnsupportedPlatform;
+            }
+            catch (Exception)
+            {
+                // A verified pending file is retained for diagnosis. It is
+                // never automatically promoted on a later load.
+                return ModuleZSaveGameStatus.PublicationError;
+            }
+
+            Debug.Log("[ModuleZ] Partida guardada: " + SavePath);
+            return ModuleZSaveGameStatus.Success;
+        }
+
+        private static void DeleteOwnedPending(string path)
+        {
+            try { File.Delete(path); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+            catch (System.Security.SecurityException) { }
+        }
+
+        private static ModuleZSaveData CaptureSaveData()
         {
             ModuleZSaveData data = new ModuleZSaveData();
 
@@ -69,12 +199,7 @@ namespace ModuleZ.Core.SaveSystem
             ModuleZAchievementManager.EvaluateAll();
 
             data.achievements = ModuleZAchievementManager.GetAll();
-
-            string json = JsonUtility.ToJson(data, true);
-            Directory.CreateDirectory(ModuleZPersistencePaths.RootPath);
-            File.WriteAllText(SavePath, json);
-
-            Debug.Log("[ModuleZ] Partida guardada: " + SavePath);
+            return data;
         }
 
         public static void LoadGame()
@@ -252,20 +377,52 @@ namespace ModuleZ.Core.SaveSystem
 
         private static ModuleZLoadGameStatus TryReadSaveData(out ModuleZSaveData data)
         {
+            ModuleZLoadGameStatus main = TryReadSaveDataAt(SavePath, out data);
+            if (main != ModuleZLoadGameStatus.InvalidData)
+            {
+                ReportReadFailure(main);
+                return main;
+            }
+
+            // A corrupt main may have a valid, older copy from the previous
+            // successful replacement. Read it without rewriting either file.
+            ModuleZLoadGameStatus backup = TryReadSaveDataAt(BackupPath, out ModuleZSaveData recovered);
+            if (backup == ModuleZLoadGameStatus.Success)
+            {
+                data = recovered;
+                Debug.LogWarning("[ModuleZ] Guardado principal inválido; se leyó la copia de recuperación.");
+                return ModuleZLoadGameStatus.Success;
+            }
+
+            data = null;
+            ReportReadFailure(main);
+            return main;
+        }
+
+        private static void ReportReadFailure(ModuleZLoadGameStatus status)
+        {
+            if (status == ModuleZLoadGameStatus.NotFound)
+                Debug.Log("[ModuleZ] No existe partida guardada.");
+            else if (status == ModuleZLoadGameStatus.ReadError)
+                Debug.LogWarning("[ModuleZ] No se pudo leer la partida.");
+            else if (status == ModuleZLoadGameStatus.InvalidData)
+                Debug.LogWarning("[ModuleZ] SaveData inválido.");
+        }
+
+        private static ModuleZLoadGameStatus TryReadSaveDataAt(string path, out ModuleZSaveData data)
+        {
             data = null;
             string json;
             try
             {
-                json = File.ReadAllText(SavePath);
+                json = File.ReadAllText(path);
             }
             catch (FileNotFoundException)
             {
-                Debug.Log("[ModuleZ] No existe partida guardada.");
                 return ModuleZLoadGameStatus.NotFound;
             }
             catch (DirectoryNotFoundException)
             {
-                Debug.Log("[ModuleZ] No existe partida guardada.");
                 return ModuleZLoadGameStatus.NotFound;
             }
             catch (Exception exception) when (exception is IOException ||
@@ -274,7 +431,6 @@ namespace ModuleZ.Core.SaveSystem
                 exception is System.Security.SecurityException ||
                 exception is NotSupportedException)
             {
-                Debug.LogWarning("[ModuleZ] No se pudo leer la partida: " + exception.Message);
                 return ModuleZLoadGameStatus.ReadError;
             }
 
@@ -291,13 +447,11 @@ namespace ModuleZ.Core.SaveSystem
             catch (Exception exception) when (exception is ArgumentException ||
                 exception is FormatException)
             {
-                Debug.LogWarning("[ModuleZ] SaveData inválido: " + exception.Message);
                 return ModuleZLoadGameStatus.InvalidData;
             }
 
             if (!IsValid(data))
             {
-                Debug.LogWarning("[ModuleZ] SaveData inválido.");
                 return ModuleZLoadGameStatus.InvalidData;
             }
 
@@ -596,8 +750,12 @@ namespace ModuleZ.Core.SaveSystem
             try
             {
                 // File.Delete is a no-op for a missing file, but unlike a
-                // File.Exists guard it reports access and I/O failures.
+                // File.Exists guard it reports access and I/O failures. If
+                // deletion is interrupted, leave the backup until last so a
+                // recovery copy is not discarded before the main is removed.
                 File.Delete(SavePath);
+                File.Delete(PendingPath);
+                File.Delete(BackupPath);
                 ModuleZAchievementManager.ResetAll();
                 Debug.Log("[ModuleZ] Partida eliminada.");
                 return true;
