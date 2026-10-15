@@ -32,11 +32,36 @@ namespace ModuleZ.Tests.EditMode
         private FieldInfo unlockHandler;
         private object priorUnlockHandler;
         private object reentrantSaveStatus;
+        private bool isolatedRootReserved;
+        private bool rootOverrideInstalled;
+        private bool setupMutationStarted;
+        private bool setupComplete;
 
         [SetUp]
         public void SetUp()
         {
             attempts.Clear();
+            bridge = null;
+            context = null;
+            attempt = null;
+            rival = null;
+            session = null;
+            gameState = null;
+            saveManager = null;
+            paths = null;
+            priorGame = null;
+            priorSession = null;
+            priorAchievements = null;
+            achievementManager = null;
+            unlockHandler = null;
+            priorUnlockHandler = null;
+            originalRoot = null;
+            isolatedRoot = null;
+            reentrantSaveStatus = null;
+            isolatedRootReserved = false;
+            rootOverrideInstalled = false;
+            setupMutationStarted = false;
+            setupComplete = false;
             bridge = Require("ModuleZ.Game.DuelTransition.DuelTransitionBridge");
             context = Require("ModuleZ.Game.DuelTransition.DuelContext");
             attempt = Require("ModuleZ.Game.DuelTransition.DuelTransitionBridge+Attempt");
@@ -47,65 +72,116 @@ namespace ModuleZ.Tests.EditMode
             paths = Require("ModuleZ.Core.SaveSystem.ModuleZPersistencePaths");
             priorGame = Snapshot(gameState);
             priorSession = Snapshot(session);
-            priorAchievements = new Dictionary<object, object[]>();
+            var achievements = new Dictionary<object, object[]>();
             achievementManager = Require("ModuleZ.Core.Achievements.ModuleZAchievementManager");
             unlockHandler = achievementManager.GetField("OnAchievementUnlocked", PublicStatic);
             priorUnlockHandler = unlockHandler.GetValue(null);
             foreach (object state in (IEnumerable)achievementManager.GetMethod("GetAll").Invoke(null, null))
             {
                 Type stateType = state.GetType();
-                priorAchievements.Add(state, new[] {
+                achievements.Add(state, new[] {
                     stateType.GetField("unlocked").GetValue(state),
                     stateType.GetField("unlockedDate").GetValue(state)
                 });
             }
+            priorAchievements = achievements;
             originalRoot = (string)paths.GetProperty("RootPath").GetValue(null);
             isolatedRoot = Path.Combine(Path.GetTempPath(),
                 "ModuleZ-EP02-02-" + Guid.NewGuid().ToString("N"));
             AssertSafeIsolatedRoot();
+            Assert.That(Directory.Exists(isolatedRoot) || File.Exists(isolatedRoot),
+                Is.False, "The fixture must own a new isolated directory");
+            isolatedRootReserved = true;
+            Directory.CreateDirectory(isolatedRoot);
+            AssertSafeIsolatedRoot();
             paths.GetMethod("SetRootOverride").Invoke(null, new object[] { isolatedRoot });
+            rootOverrideInstalled = true;
+            Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                Is.EqualTo(isolatedRoot));
+            setupMutationStarted = true;
             Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
                 .Invoke(null, null), Is.True);
             gameState.GetMethod("ResetGameState").Invoke(null, null);
             session.GetMethod("Clear").Invoke(null, null);
             ConfirmFreshStart();
+            setupComplete = true;
         }
 
         [TearDown]
         public void TearDown()
         {
-            try
+            var failures = new List<Exception>();
+            foreach (object token in attempts)
+                CleanupStep(failures, "Cancel owned transition", () => Cancel(token));
+            attempts.Clear();
+
+            if (setupComplete && rootOverrideInstalled)
+                CleanupStep(failures, "Delete isolated save", () => {
+                    Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                        Is.EqualTo(isolatedRoot));
+                    Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                        .Invoke(null, null), Is.True);
+                });
+
+            if (setupMutationStarted)
             {
-                foreach (object token in attempts)
-                    Cancel(token);
-                attempts.Clear();
-                Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
-                    .Invoke(null, null), Is.True);
-                gameState.GetMethod("ResetGameState").Invoke(null, null);
-                session.GetMethod("Clear").Invoke(null, null);
-                ConfirmFreshStart();
-                Restore(priorGame);
-                RestoreSession(priorSession);
-                foreach (var entry in priorAchievements)
-                {
-                    Type stateType = entry.Key.GetType();
-                    stateType.GetField("unlocked").SetValue(entry.Key, entry.Value[0]);
-                    stateType.GetField("unlockedDate").SetValue(entry.Key, entry.Value[1]);
-                }
-                achievementManager.GetMethod("LoadStates").Invoke(null,
-                    new object[] { AchievementList(priorAchievements.Keys) });
-                unlockHandler.SetValue(null, priorUnlockHandler);
+                CleanupStep(failures, "Reset fixture GameState", () =>
+                    gameState.GetMethod("ResetGameState").Invoke(null, null));
+                CleanupStep(failures, "Clear fixture DuelSession", () =>
+                    session.GetMethod("Clear").Invoke(null, null));
+                CleanupStep(failures, "Confirm fresh fixture state", ConfirmFreshStart);
+                CleanupStep(failures, "Restore GameState", () => Restore(priorGame));
+                CleanupStep(failures, "Restore DuelSession", () =>
+                    RestoreSession(priorSession));
+                CleanupStep(failures, "Restore achievement fields", () => {
+                    foreach (var entry in priorAchievements)
+                    {
+                        Type stateType = entry.Key.GetType();
+                        stateType.GetField("unlocked").SetValue(entry.Key, entry.Value[0]);
+                        stateType.GetField("unlockedDate").SetValue(entry.Key, entry.Value[1]);
+                    }
+                });
+                CleanupStep(failures, "Restore achievement list", () =>
+                    achievementManager.GetMethod("LoadStates").Invoke(null,
+                        new object[] { AchievementList(priorAchievements.Keys) }));
+                CleanupStep(failures, "Restore achievement callback", () =>
+                    unlockHandler.SetValue(null, priorUnlockHandler));
             }
-            finally
-            {
-                paths.GetMethod("ClearRootOverride").Invoke(null, null);
-                Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
-                    Is.EqualTo(originalRoot));
-                if (Directory.Exists(isolatedRoot))
-                {
+
+            if (paths != null && originalRoot != null && isolatedRoot != null)
+                CleanupStep(failures, "Restore persistence root", () => {
+                    string currentRoot = (string)paths.GetProperty("RootPath")
+                        .GetValue(null);
+                    if (rootOverrideInstalled || currentRoot == isolatedRoot)
+                    {
+                        Assert.That(currentRoot, Is.EqualTo(isolatedRoot),
+                            "Do not clear an override owned by another producer");
+                        paths.GetMethod("ClearRootOverride").Invoke(null, null);
+                    }
+                    Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                        Is.EqualTo(originalRoot));
+                });
+
+            if (isolatedRootReserved && isolatedRoot != null)
+                CleanupStep(failures, "Remove owned isolated directory", () => {
                     AssertSafeIsolatedRoot();
-                    Directory.Delete(isolatedRoot, true);
-                }
+                    if (Directory.Exists(isolatedRoot))
+                        Directory.Delete(isolatedRoot, true);
+                });
+
+            if (failures.Count > 0)
+                throw new AggregateException(
+                    "Fixture cleanup failed; the original test or SetUp failure remains separately reported.",
+                    failures);
+        }
+
+        private static void CleanupStep(List<Exception> failures, string step,
+            Action action)
+        {
+            try { action(); }
+            catch (Exception exception)
+            {
+                failures.Add(new InvalidOperationException(step, exception));
             }
         }
 
