@@ -15,10 +15,16 @@ namespace ModuleZ.Duel3D.Runtime
             Transform runtimeOwner,
             out GameObject runtimeObject,
             out Duel3DRuntimeBuilder runtimeBuilder,
+            out DuelContext acceptedContext,
+            out ulong sessionRevision,
+            out bool fromSession,
             out string failureReason)
         {
             runtimeObject = null;
             runtimeBuilder = null;
+            acceptedContext = default;
+            fromSession = ModuleZDuelSessionState.HasActiveDuel;
+            sessionRevision = ModuleZDuelSessionState.Revision;
             failureReason = null;
 
             if (runtimeOwner == null)
@@ -28,9 +34,20 @@ namespace ModuleZ.Duel3D.Runtime
             }
 
             if (!TryResolveAcceptedContext(
-                    out DuelContext acceptedContext,
+                    out acceptedContext,
                     out failureReason))
                 return false;
+
+            if (fromSession &&
+                (!ModuleZDuelSessionState.HasActiveDuel ||
+                 ModuleZDuelSessionState.Revision != sessionRevision ||
+                 ModuleZDuelSessionState.RivalId != acceptedContext.RivalId ||
+                 ModuleZDuelSessionState.IsRematch != acceptedContext.IsRematch ||
+                 ModuleZDuelSessionState.ReturnPosition != acceptedContext.ReturnPosition))
+            {
+                failureReason = "Duel session changed while accepting context.";
+                return false;
+            }
 
             try
             {
@@ -39,7 +56,8 @@ namespace ModuleZ.Duel3D.Runtime
                 runtimeBuilder =
                     runtimeObject.AddComponent<Duel3DRuntimeBuilder>();
 
-                if (!runtimeBuilder.Initialize(acceptedContext))
+                if (!runtimeBuilder.Initialize(acceptedContext,
+                        sessionRevision, fromSession))
                 {
                     failureReason =
                         "Duel3D runtime rejected the accepted DuelContext.";

@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using ModuleZ.Core.Managers;
 using ModuleZ.Core.SceneLoading;
+using ModuleZ.Core.SaveSystem;
 using ModuleZ.OpenWorld.Encounters;
+using ModuleZ.Duel3D.Runtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +23,10 @@ namespace ModuleZ.Game.DuelTransition
             internal readonly int OriginSceneHandle;
             internal ulong PublishedRevision;
             internal bool Committed;
+            internal bool LoadRequested;
+            internal int DuelSceneHandle = -1;
+            public bool IsLoadRequested => LoadRequested;
+            public bool IsReadyConfirmed => Committed;
 
             internal Attempt(DuelContext context)
             {
@@ -115,11 +122,9 @@ namespace ModuleZ.Game.DuelTransition
         // cannot later request a rollback. Production uses the overload below.
         public static bool Begin(DuelContext context, out string failureReason)
         {
-            if (!IsValid(context, out failureReason))
-                return false;
-
-            Publish(context);
-            return true;
+            // Retain the compatibility signature, but never publish an
+            // unguarded provisional projection.
+            return Begin(context, out Attempt _, out failureReason);
         }
 
         public static bool Begin(
@@ -138,7 +143,22 @@ namespace ModuleZ.Game.DuelTransition
             }
 
             attempt = new Attempt(context);
-            Publish(context);
+            if (!ModuleZSaveManager.BeginProvisionalTransition(attempt))
+            {
+                attempt = null;
+                failureReason = "Save lifecycle is not stable for a duel transition.";
+                return false;
+            }
+            try
+            {
+                Publish(context);
+            }
+            catch
+            {
+                ModuleZSaveManager.EndProvisionalTransition(attempt, false);
+                pendingAttempt = null;
+                throw;
+            }
             attempt.PublishedRevision = ModuleZDuelSessionState.Revision;
             pendingAttempt = attempt;
             return true;
@@ -147,6 +167,7 @@ namespace ModuleZ.Game.DuelTransition
         public static bool Cancel(Attempt attempt)
         {
             if (attempt == null || attempt.Committed ||
+                attempt.LoadRequested ||
                 !ReferenceEquals(pendingAttempt, attempt))
                 return false;
 
@@ -155,6 +176,7 @@ namespace ModuleZ.Game.DuelTransition
             if (ModuleZDuelSessionState.Revision != attempt.PublishedRevision)
             {
                 pendingAttempt = null;
+                ModuleZSaveManager.EndProvisionalTransition(attempt, false);
                 return false;
             }
 
@@ -166,6 +188,7 @@ namespace ModuleZ.Game.DuelTransition
             else
                 ModuleZDuelSessionState.Clear();
             pendingAttempt = null;
+            ModuleZSaveManager.EndProvisionalTransition(attempt, fullyOwned);
             return fullyOwned;
         }
 
@@ -210,11 +233,18 @@ namespace ModuleZ.Game.DuelTransition
 
             bool wasPaused = ModuleZGameState.IsPaused;
             ModuleZGameState.IsPaused = false;
-            attempt.Committed = true;
-            pendingAttempt = null;
+            attempt.LoadRequested = true;
+            SceneManager.sceneLoaded += OnSceneLoaded;
             try
             {
                 ModuleZSceneController.Instance.LoadDuel();
+                if (ReferenceEquals(pendingAttempt, attempt))
+                    ModuleZSceneController.Instance.StartCoroutine(WaitForReady(attempt));
+                if (!ReferenceEquals(pendingAttempt, attempt) && !attempt.Committed)
+                {
+                    failureReason = "Duel scene rejected initialization.";
+                    return false;
+                }
                 failureReason = null;
                 return true;
             }
@@ -224,13 +254,120 @@ namespace ModuleZ.Game.DuelTransition
                 // Undo only a synchronous failure in the original scene.
                 if (SceneManager.GetActiveScene().handle == attempt.OriginSceneHandle)
                 {
-                    attempt.Committed = false;
-                    pendingAttempt = attempt;
+                    attempt.LoadRequested = false;
+                    SceneManager.sceneLoaded -= OnSceneLoaded;
                     if (Cancel(attempt))
                         ModuleZGameState.IsPaused = wasPaused;
                 }
+                else
+                    FailReadiness(attempt);
                 return false;
             }
+        }
+
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            Attempt attempt = pendingAttempt;
+            if (attempt == null || !attempt.LoadRequested)
+                return;
+            if (scene.name != ModuleZSceneController.DuelScene ||
+                mode != LoadSceneMode.Single || attempt.DuelSceneHandle != -1)
+            {
+                FailReadiness(attempt);
+                return;
+            }
+            attempt.DuelSceneHandle = scene.handle;
+        }
+
+        private static IEnumerator WaitForReady(Attempt attempt)
+        {
+            float deadline = Time.realtimeSinceStartup + 20f;
+            while (ReferenceEquals(pendingAttempt, attempt) && attempt.LoadRequested)
+            {
+                Scene scene = SceneManager.GetActiveScene();
+                bool stillAtOrigin = attempt.DuelSceneHandle == -1 &&
+                    scene.handle == attempt.OriginSceneHandle;
+                if ((!stillAtOrigin &&
+                     (scene.name != ModuleZSceneController.DuelScene ||
+                      attempt.DuelSceneHandle == -1 ||
+                      scene.handle != attempt.DuelSceneHandle)) ||
+                    Time.realtimeSinceStartup >= deadline)
+                {
+                    FailReadiness(attempt);
+                    yield break;
+                }
+                yield return null;
+            }
+        }
+
+        // Called by the scene owner, never by LoadDuel's return path.
+        public static bool IsAwaitingReadiness(Scene scene)
+        {
+            return pendingAttempt != null && pendingAttempt.LoadRequested &&
+                scene.name == ModuleZSceneController.DuelScene;
+        }
+
+        public static bool ConfirmReady(DuelSceneRoot root, DuelContext context,
+            ulong sessionRevision, bool fromSession)
+        {
+            Attempt attempt = pendingAttempt;
+            if (attempt == null || !attempt.LoadRequested || !fromSession ||
+                root == null || root.State != DuelSceneRoot.LifecycleState.Ready ||
+                attempt.DuelSceneHandle == -1 ||
+                root.gameObject.scene.handle != attempt.DuelSceneHandle ||
+                SceneManager.GetActiveScene().handle != attempt.DuelSceneHandle ||
+                !OwnsSession(attempt, context, sessionRevision))
+                return false;
+
+            attempt.Committed = true;
+            attempt.LoadRequested = false;
+            pendingAttempt = null;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            ModuleZSaveManager.EndProvisionalTransition(attempt, true);
+            return true;
+        }
+
+        public static void ReportSceneFailure(DuelSceneRoot root)
+        {
+            Attempt attempt = pendingAttempt;
+            if (attempt == null || !attempt.LoadRequested || root == null ||
+                root.gameObject.scene.name != ModuleZSceneController.DuelScene ||
+                root.gameObject.scene.handle != SceneManager.GetActiveScene().handle ||
+                (attempt.DuelSceneHandle != -1 &&
+                 root.gameObject.scene.handle != attempt.DuelSceneHandle))
+                return;
+            FailReadiness(attempt);
+        }
+
+        private static bool OwnsSession(Attempt attempt, DuelContext context,
+            ulong revision)
+        {
+            return ModuleZDuelSessionState.HasActiveDuel &&
+                revision == attempt.PublishedRevision &&
+                ModuleZDuelSessionState.Revision == revision &&
+                context.RivalId == attempt.Context.RivalId &&
+                context.IsRematch == attempt.Context.IsRematch &&
+                context.ReturnPosition == attempt.Context.ReturnPosition &&
+                ModuleZDuelSessionState.RivalId == context.RivalId &&
+                ModuleZDuelSessionState.IsRematch == context.IsRematch &&
+                ModuleZDuelSessionState.ReturnPosition == context.ReturnPosition;
+        }
+
+        private static void FailReadiness(Attempt attempt)
+        {
+            if (!ReferenceEquals(pendingAttempt, attempt))
+                return;
+            pendingAttempt = null;
+            attempt.LoadRequested = false;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            ModuleZSaveManager.EndProvisionalTransition(attempt, false);
+            if (ModuleZDuelSessionState.HasActiveDuel &&
+                ModuleZDuelSessionState.Revision == attempt.PublishedRevision &&
+                ModuleZDuelSessionState.RivalId == attempt.Context.RivalId &&
+                ModuleZDuelSessionState.IsRematch == attempt.Context.IsRematch &&
+                ModuleZDuelSessionState.ReturnPosition == attempt.Context.ReturnPosition)
+                ModuleZDuelSessionState.Clear();
+            Debug.LogError("[ModuleZ] Duel scene did not confirm Ready; save remains blocked.");
         }
 
         private static void Publish(DuelContext context)

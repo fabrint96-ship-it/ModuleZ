@@ -1,4 +1,6 @@
 using ModuleZ.Core.Managers;
+using ModuleZ.Game.DuelTransition;
+using ModuleZ.OpenWorld.Encounters;
 using UnityEngine;
 
 namespace ModuleZ.Duel3D.Runtime
@@ -15,12 +17,26 @@ namespace ModuleZ.Duel3D.Runtime
         }
 
         [SerializeField] private DuelBootstrap bootstrap;
+        private ulong initializationRevision;
+        private bool initializationSessionActive;
+        private ModuleZRivalId initializationRival;
+        private bool initializationRematch;
+        private Vector3 initializationReturnPosition;
 
         public LifecycleState State { get; private set; } =
             LifecycleState.Uninitialized;
 
         public GameObject RuntimeObject { get; private set; }
         public Duel3DRuntimeBuilder RuntimeBuilder { get; private set; }
+
+        private void Awake()
+        {
+            initializationRevision = ModuleZDuelSessionState.Revision;
+            initializationSessionActive = ModuleZDuelSessionState.HasActiveDuel;
+            initializationRival = ModuleZDuelSessionState.RivalId;
+            initializationRematch = ModuleZDuelSessionState.IsRematch;
+            initializationReturnPosition = ModuleZDuelSessionState.ReturnPosition;
+        }
 
         private void Start()
         {
@@ -56,6 +72,9 @@ namespace ModuleZ.Duel3D.Runtime
                     transform,
                     out GameObject runtimeObject,
                     out Duel3DRuntimeBuilder runtimeBuilder,
+                    out DuelContext acceptedContext,
+                    out ulong sessionRevision,
+                    out bool fromSession,
                     out string failureReason))
             {
                 return Fail(failureReason);
@@ -67,9 +86,27 @@ namespace ModuleZ.Duel3D.Runtime
                 return Fail(failureReason);
             }
 
+            if (fromSession &&
+                ModuleZDuelSessionState.Revision != sessionRevision)
+            {
+                CleanUpFailedRuntime(runtimeObject);
+                return Fail("Duel session changed during initialization.");
+            }
+
             RuntimeObject = runtimeObject;
             RuntimeBuilder = runtimeBuilder;
             State = LifecycleState.Ready;
+
+            bool expectedByBridge = DuelTransitionBridge.IsAwaitingReadiness(
+                gameObject.scene);
+            if (!DuelTransitionBridge.ConfirmReady(this, acceptedContext,
+                    sessionRevision, fromSession) && expectedByBridge)
+            {
+                CleanUpFailedRuntime(runtimeObject);
+                RuntimeObject = null;
+                RuntimeBuilder = null;
+                return Fail("Duel readiness did not match transition ownership.");
+            }
 
             Debug.Log("[ModuleZ] DuelSceneRoot ready.");
             return true;
@@ -86,10 +123,31 @@ namespace ModuleZ.Duel3D.Runtime
 
         private bool Fail(string failureReason)
         {
-            ModuleZDuelSessionState.Clear();
+            DuelTransitionBridge.ReportSceneFailure(this);
+            ClearOwnedSession();
             State = LifecycleState.Failed;
             Debug.LogError("[ModuleZ] DuelSceneRoot failed: " + failureReason);
             return false;
+        }
+
+        private void ClearOwnedSession()
+        {
+            if (initializationSessionActive &&
+                ModuleZDuelSessionState.HasActiveDuel &&
+                ModuleZDuelSessionState.Revision == initializationRevision &&
+                ModuleZDuelSessionState.RivalId == initializationRival &&
+                ModuleZDuelSessionState.IsRematch == initializationRematch &&
+                ModuleZDuelSessionState.ReturnPosition == initializationReturnPosition)
+                ModuleZDuelSessionState.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            if (State != LifecycleState.Ready)
+            {
+                DuelTransitionBridge.ReportSceneFailure(this);
+                ClearOwnedSession();
+            }
         }
     }
 }

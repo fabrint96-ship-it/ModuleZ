@@ -31,11 +31,37 @@ namespace ModuleZ.Tests.EditMode
         private Type achievementManager;
         private FieldInfo unlockHandler;
         private object priorUnlockHandler;
+        private object reentrantSaveStatus;
+        private bool isolatedRootReserved;
+        private bool rootOverrideInstalled;
+        private bool setupMutationStarted;
+        private bool setupComplete;
 
         [SetUp]
         public void SetUp()
         {
             attempts.Clear();
+            bridge = null;
+            context = null;
+            attempt = null;
+            rival = null;
+            session = null;
+            gameState = null;
+            saveManager = null;
+            paths = null;
+            priorGame = null;
+            priorSession = null;
+            priorAchievements = null;
+            achievementManager = null;
+            unlockHandler = null;
+            priorUnlockHandler = null;
+            originalRoot = null;
+            isolatedRoot = null;
+            reentrantSaveStatus = null;
+            isolatedRootReserved = false;
+            rootOverrideInstalled = false;
+            setupMutationStarted = false;
+            setupComplete = false;
             bridge = Require("ModuleZ.Game.DuelTransition.DuelTransitionBridge");
             context = Require("ModuleZ.Game.DuelTransition.DuelContext");
             attempt = Require("ModuleZ.Game.DuelTransition.DuelTransitionBridge+Attempt");
@@ -46,56 +72,116 @@ namespace ModuleZ.Tests.EditMode
             paths = Require("ModuleZ.Core.SaveSystem.ModuleZPersistencePaths");
             priorGame = Snapshot(gameState);
             priorSession = Snapshot(session);
-            priorAchievements = new Dictionary<object, object[]>();
+            var achievements = new Dictionary<object, object[]>();
             achievementManager = Require("ModuleZ.Core.Achievements.ModuleZAchievementManager");
             unlockHandler = achievementManager.GetField("OnAchievementUnlocked", PublicStatic);
             priorUnlockHandler = unlockHandler.GetValue(null);
             foreach (object state in (IEnumerable)achievementManager.GetMethod("GetAll").Invoke(null, null))
             {
                 Type stateType = state.GetType();
-                priorAchievements.Add(state, new[] {
+                achievements.Add(state, new[] {
                     stateType.GetField("unlocked").GetValue(state),
                     stateType.GetField("unlockedDate").GetValue(state)
                 });
             }
+            priorAchievements = achievements;
             originalRoot = (string)paths.GetProperty("RootPath").GetValue(null);
             isolatedRoot = Path.Combine(Path.GetTempPath(),
                 "ModuleZ-EP02-02-" + Guid.NewGuid().ToString("N"));
             AssertSafeIsolatedRoot();
+            Assert.That(Directory.Exists(isolatedRoot) || File.Exists(isolatedRoot),
+                Is.False, "The fixture must own a new isolated directory");
+            isolatedRootReserved = true;
+            Directory.CreateDirectory(isolatedRoot);
+            AssertSafeIsolatedRoot();
             paths.GetMethod("SetRootOverride").Invoke(null, new object[] { isolatedRoot });
+            rootOverrideInstalled = true;
+            Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                Is.EqualTo(isolatedRoot));
+            setupMutationStarted = true;
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
             session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
+            setupComplete = true;
         }
 
         [TearDown]
         public void TearDown()
         {
-            try
+            var failures = new List<Exception>();
+            foreach (object token in attempts)
+                CleanupStep(failures, "Cancel owned transition", () => Cancel(token));
+            attempts.Clear();
+
+            if (setupComplete && rootOverrideInstalled)
+                CleanupStep(failures, "Delete isolated save", () => {
+                    Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                        Is.EqualTo(isolatedRoot));
+                    Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                        .Invoke(null, null), Is.True);
+                });
+
+            if (setupMutationStarted)
             {
-                foreach (object token in attempts)
-                    Cancel(token);
-                attempts.Clear();
-                Restore(priorGame);
-                RestoreSession(priorSession);
-                foreach (var entry in priorAchievements)
-                {
-                    Type stateType = entry.Key.GetType();
-                    stateType.GetField("unlocked").SetValue(entry.Key, entry.Value[0]);
-                    stateType.GetField("unlockedDate").SetValue(entry.Key, entry.Value[1]);
-                }
-                achievementManager.GetMethod("LoadStates").Invoke(null,
-                    new object[] { AchievementList(priorAchievements.Keys) });
-                unlockHandler.SetValue(null, priorUnlockHandler);
+                CleanupStep(failures, "Reset fixture GameState", () =>
+                    gameState.GetMethod("ResetGameState").Invoke(null, null));
+                CleanupStep(failures, "Clear fixture DuelSession", () =>
+                    session.GetMethod("Clear").Invoke(null, null));
+                CleanupStep(failures, "Confirm fresh fixture state", ConfirmFreshStart);
+                CleanupStep(failures, "Restore GameState", () => Restore(priorGame));
+                CleanupStep(failures, "Restore DuelSession", () =>
+                    RestoreSession(priorSession));
+                CleanupStep(failures, "Restore achievement fields", () => {
+                    foreach (var entry in priorAchievements)
+                    {
+                        Type stateType = entry.Key.GetType();
+                        stateType.GetField("unlocked").SetValue(entry.Key, entry.Value[0]);
+                        stateType.GetField("unlockedDate").SetValue(entry.Key, entry.Value[1]);
+                    }
+                });
+                CleanupStep(failures, "Restore achievement list", () =>
+                    achievementManager.GetMethod("LoadStates").Invoke(null,
+                        new object[] { AchievementList(priorAchievements.Keys) }));
+                CleanupStep(failures, "Restore achievement callback", () =>
+                    unlockHandler.SetValue(null, priorUnlockHandler));
             }
-            finally
-            {
-                paths.GetMethod("ClearRootOverride").Invoke(null, null);
-                Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
-                    Is.EqualTo(originalRoot));
-                if (Directory.Exists(isolatedRoot))
-                {
+
+            if (paths != null && originalRoot != null && isolatedRoot != null)
+                CleanupStep(failures, "Restore persistence root", () => {
+                    string currentRoot = (string)paths.GetProperty("RootPath")
+                        .GetValue(null);
+                    if (rootOverrideInstalled || currentRoot == isolatedRoot)
+                    {
+                        Assert.That(currentRoot, Is.EqualTo(isolatedRoot),
+                            "Do not clear an override owned by another producer");
+                        paths.GetMethod("ClearRootOverride").Invoke(null, null);
+                    }
+                    Assert.That((string)paths.GetProperty("RootPath").GetValue(null),
+                        Is.EqualTo(originalRoot));
+                });
+
+            if (isolatedRootReserved && isolatedRoot != null)
+                CleanupStep(failures, "Remove owned isolated directory", () => {
                     AssertSafeIsolatedRoot();
-                    Directory.Delete(isolatedRoot, true);
-                }
+                    if (Directory.Exists(isolatedRoot))
+                        Directory.Delete(isolatedRoot, true);
+                });
+
+            if (failures.Count > 0)
+                throw new AggregateException(
+                    "Fixture cleanup failed; the original test or SetUp failure remains separately reported.",
+                    failures);
+        }
+
+        private static void CleanupStep(List<Exception> failures, string step,
+            Action action)
+        {
+            try { action(); }
+            catch (Exception exception)
+            {
+                failures.Add(new InvalidOperationException(step, exception));
             }
         }
 
@@ -203,6 +289,132 @@ namespace ModuleZ.Tests.EditMode
             Assert.That(Cancel(token), Is.True);
             Assert.That(Cancel(token), Is.False);
             Assert.That(Complete(token)[0], Is.False);
+        }
+
+        [Test]
+        public void LIFE_001_002_StableSaveSucceedsAndPendingTransitionRejectsBeforeCapture()
+        {
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+            Assert.That(File.Exists(SavePath()), Is.True);
+            object token = Begin(1)[1];
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.False);
+            Assert.That(File.Exists(SavePath()), Is.True);
+            Assert.That(Cancel(token), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_003_ObsoleteTransitionCannotUnlockUncertainProjection()
+        {
+            object token = Begin(1)[1];
+            session.GetMethod("Clear").Invoke(null, null);
+            Assert.That(Cancel(token), Is.False);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
+            session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_004_FailedLoadBlocksSaveUntilExplicitRecovery()
+        {
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(), "{malformed");
+            LogAssert.Expect(LogType.Warning, new Regex("SaveData inválido"));
+            Assert.That(Load().ToString(), Is.EqualTo("InvalidData"));
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(saveManager.GetMethod("TryDeleteSave", PublicStatic)
+                .Invoke(null, null), Is.True);
+            gameState.GetMethod("ResetGameState").Invoke(null, null);
+            session.GetMethod("Clear").Invoke(null, null);
+            ConfirmFreshStart();
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+        }
+
+        [Test]
+        public void LIFE_002_ReentrantSaveDuringLoadIsRejectedBeforeCapture()
+        {
+            achievementManager.GetMethod("ResetAll").Invoke(null, null);
+            Type idType = Require("ModuleZ.Core.Achievements.ModuleZAchievementId");
+            MethodInfo capture = GetType().GetMethod(nameof(CaptureReentrantSave),
+                BindingFlags.Public | BindingFlags.Instance).MakeGenericMethod(idType);
+            unlockHandler.SetValue(null, Delegate.CreateDelegate(
+                unlockHandler.FieldType, this, capture));
+            Directory.CreateDirectory(isolatedRoot);
+            File.WriteAllText(SavePath(),
+                "{\"duelsWon\":1,\"duelsLost\":0,\"duelsAbandoned\":0}");
+            Assert.That(Load().ToString(), Is.EqualTo("Success"));
+            Assert.That(reentrantSaveStatus?.ToString(), Is.EqualTo("LifecycleRejected"));
+        }
+
+        public void CaptureReentrantSave<T>(T id)
+        {
+            reentrantSaveStatus = Save();
+        }
+
+        [Test]
+        public void LIFE_005_LegacyCompletedFlagAloneCannotAuthorizeActiveSession()
+        {
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 1), false, (object)Vector3.one });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            gameState.GetField("DuelCompleted").SetValue(null, true);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+        }
+
+        [Test]
+        public void LIFE_005A_ResultAuthorizationRequiresSameAcceptedSessionAndConfirmation()
+        {
+            object madrid = Enum.ToObject(rival, 0);
+            Vector3 returnPosition = new Vector3(4f, 0f, 7f);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { madrid, false, (object)returnPosition });
+            ulong revision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, returnPosition, revision), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "An applied result is not publishable until confirmed.");
+            Assert.That(ConfirmResult(0, false, returnPosition, 1, revision), Is.False,
+                "A different result rival cannot confirm this session.");
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            Assert.That(ConfirmResult(0, false, returnPosition, 0, revision), Is.True);
+            Assert.That(Save().ToString(), Is.EqualTo("Success"));
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { madrid, false, (object)returnPosition });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "A published result cannot authorize a later identical session.");
+        }
+
+        [Test]
+        public void LIFE_005B_ReplacedSessionCannotConfirmOrPublishPendingResult()
+        {
+            Vector3 returnPosition = Vector3.one;
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)returnPosition });
+            ulong oldRevision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, returnPosition, oldRevision), Is.True);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)returnPosition });
+            Assert.That(ConfirmResult(0, false, returnPosition, 0, oldRevision), Is.False);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
+            session.GetMethod("Clear").Invoke(null, null);
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"),
+                "Losing the session must remain blocked outside Duel as well.");
+        }
+
+        [Test]
+        public void LIFE_005C_NoSessionCannotCreateResultAuthorization()
+        {
+            ulong revision = (ulong)session.GetProperty("Revision").GetValue(null);
+            Assert.That(BeginResult(0, false, Vector3.zero, revision), Is.False);
+            Assert.That(ConfirmResult(0, false, Vector3.zero, 0, revision), Is.False);
+            session.GetMethod("StartDuel").Invoke(null,
+                new[] { Enum.ToObject(rival, 0), false, (object)Vector3.zero });
+            Assert.That(Save().ToString(), Is.EqualTo("LifecycleRejected"));
         }
 
         [Test]
@@ -418,6 +630,37 @@ namespace ModuleZ.Tests.EditMode
 
         private object Load() => saveManager.GetMethod("TryLoadGame", PublicStatic)
             .Invoke(null, null);
+
+        private object Save() => saveManager.GetMethod("TrySaveGame", PublicStatic)
+            .Invoke(null, null);
+
+        private bool BeginResult(int rivalId, bool rematch,
+            Vector3 returnPosition, ulong revision)
+        {
+            MethodInfo method = saveManager.GetMethod("BeginDuelResultApplication",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null,
+                new object[] { rivalId, rematch, returnPosition, revision });
+        }
+
+        private bool ConfirmResult(int rivalId, bool rematch,
+            Vector3 returnPosition, int resultRival, ulong revision)
+        {
+            MethodInfo method = saveManager.GetMethod("ConfirmAppliedDuelResult",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null,
+                new object[] { rivalId, rematch, returnPosition, resultRival, revision });
+        }
+
+        private void ConfirmFreshStart()
+        {
+            MethodInfo confirm = saveManager.GetMethod("ConfirmFreshStart",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(confirm, Is.Not.Null);
+            Assert.That(confirm.Invoke(null, null), Is.EqualTo(true));
+        }
 
         private string SavePath() => Path.Combine(isolatedRoot, "modulez_save.json");
 

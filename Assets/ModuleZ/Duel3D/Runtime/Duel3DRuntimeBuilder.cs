@@ -71,6 +71,8 @@ namespace ModuleZ.Duel3D.Runtime
         private Duel3DRivalProfile rivalProfile;
         private DuelContext acceptedContext;
         private bool hasAcceptedContext;
+        private ulong acceptedSessionRevision;
+        private bool acceptedFromSession;
         private bool buildAttempted;
         private bool buildCompleted;
 
@@ -113,10 +115,20 @@ namespace ModuleZ.Duel3D.Runtime
 
         public bool Initialize(DuelContext context)
         {
+            // A context without bootstrap provenance is playable, not a
+            // persistence-authorized production session.
+            return Initialize(context, 0, false);
+        }
+
+        internal bool Initialize(DuelContext context, ulong sessionRevision,
+            bool fromSession)
+        {
             if (hasAcceptedContext)
                 return false;
 
             acceptedContext = context;
+            acceptedSessionRevision = sessionRevision;
+            acceptedFromSession = fromSession;
             hasAcceptedContext = true;
             return true;
         }
@@ -230,7 +242,8 @@ namespace ModuleZ.Duel3D.Runtime
                 if (resultManager == null)
                     resultManager = gameObject.AddComponent<Duel3DResultManager>();
 
-                if (!resultManager.Initialize(acceptedContext))
+                if (!resultManager.Initialize(acceptedContext,
+                        acceptedSessionRevision, acceptedFromSession))
                 {
                     failureReason =
                         "result manager composition failed: Duel3DResultManager rejected DuelContext.";
